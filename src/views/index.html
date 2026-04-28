@@ -22,10 +22,10 @@
 
     <nav>
         <ul>
-            <li><a href="#">Trang chủ</a></li>
-            <li><a href="#">Sách</a></li>
-            <li><a href="#">Giỏ hàng</a></li>
-            <li><a href="#">Đăng nhập</a></li>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="danh-muc-sach.html">Sách</a></li>
+            <li><a href="gio-hang.html">Giỏ hàng</a></li>
+            <li id="menu-login"><a href="dang-nhap.html">Đăng nhập</a></li>
         </ul>
     </nav>
 </header>
@@ -50,7 +50,7 @@
             <div class="book-content">
                 <div class="book-title">Bá tước Monte Cristo</div>
                 <div class="price">185.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -59,7 +59,7 @@
             <div class="book-content">
                 <div class="book-title">Giết con chim nhại</div>
                 <div class="price">210.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -68,7 +68,7 @@
             <div class="book-content">
                 <div class="book-title">Hai số phận</div>
                 <div class="price">320.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -77,7 +77,7 @@
             <div class="book-content">
                 <div class="book-title">Không gia đình</div>
                 <div class="price">450.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -86,7 +86,7 @@
             <div class="book-content">
                 <div class="book-title">Đắc nhân tâm</div>
                 <div class="price">150.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
             <div class="book-content">
                 <div class="book-title">Nhà giả kim</div>
                 <div class="price">100.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -104,7 +104,7 @@
             <div class="book-content">
                 <div class="book-title">Phía sau nghi can X</div>
                 <div class="price">230.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
 
@@ -113,11 +113,36 @@
             <div class="book-content">
                 <div class="book-title">Rừng Nauy</div>
                 <div class="price">240.000đ</div>
-                <button class="btn-buy">Mua ngay</button>
+                <button class="btn-buy">Xem ngay</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Khi trang web vừa tải xong thì chạy đoạn code này
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lục tìm trong bộ nhớ xem có tên khách hàng không
+        var tenUser = sessionStorage.getItem('tenKhachHang');
+
+        if (tenUser) { // Nếu có người đang đăng nhập
+            var menuLogin = document.getElementById('menu-login');
+
+            // 1. Đổi chữ thành tên người dùng (màu cam cho nổi bật)
+            // 2. Thêm nút "Đăng xuất" nhỏ ngay bên cạnh
+            menuLogin.innerHTML = `
+                <a href="#" style="color: #f39c12; font-weight: bold;">👋 Chào, ${tenUser}</a>
+                <a href="#" onclick="dangXuat()" style="font-size: 12px; color: #e74c3c; margin-left: 5px; cursor: pointer;">(Thoát)</a>
+            `;
+        }
+    });
+
+    // Hàm xử lý khi bấm nút (Thoát)
+    function dangXuat() {
+        sessionStorage.removeItem('tenKhachHang'); // Xóa tên khỏi bộ nhớ
+        window.location.reload(); // Tải lại trang web về trạng thái ban đầu
+    }
+</script>
 
 </body>
 </html>
