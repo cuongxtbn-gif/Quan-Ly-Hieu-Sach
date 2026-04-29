@@ -1,10 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Mục Sách - Bookstore</title>
+    <link rel="stylesheet" href="../assets/css/dinh-dang.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<header>
+    <div class="logo">🐵 BOOKSTORE</div>
+    <div class="search-bar">
+        <input type="text" placeholder="Tìm kiếm sách bạn yêu thích">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="danh-muc-sach.html">Sách</a></li>
+            <li><a href="gio-hang.html">Giỏ hàng</a></li>
+            <li><a href="dang-nhap.html">Đăng nhập</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="filter-bar">
+        <div class="filter-item">
+            <label for="sort-select">Sắp xếp theo:</label>
+            <select id="sort-select">
+                <option value="popular">Mức độ phổ biến</option>
+                <option value="high-low">Giá: Cao -> Thấp</option>
+                <option value="low-high">Giá: Thấp -> Cao</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label for="category-select">Thể loại:</label>
+            <select id="category-select">
+                <option value="Tất cả">Tất cả</option>
+                <option value="Văn học">Văn học</option>
+                <option value="Trinh thám">Trinh thám</option>
+                <option value="Kỹ năng">Kỹ năng</option>
+                <option value="Kinh tế">Kinh tế</option>
+                <option value="Tâm lý">Tâm lý</option>
+                <option value="Ngoại ngữ">Ngoại ngữ</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="book-catalog-grid"></div>
+
+    <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">Tiếp theo &raquo;</button>
+    </div>
+</div> <script>
+    // 1. DỮ LIỆU SÁCH CỦA BẠN (46 Quyển)
+    const dsSach = [
+        { title: "Cây Cam Ngọt Của Tôi", price: 81000, img: src="../assets/images/cay-cam-ngot-cua-toi.png", category: "Văn học" },
+        { title: "Không Diệt Không Sinh Đừng Sợ Hãi", price: 82500, img: src="../assets/images/q2.png", category: "Kỹ năng" },
+        { title: "Khi Hơi Thở Hóa Thinh Không", price: 81750, img: src="../assets/images/q3.png", category: "Văn học" },
+        { title: "Đàn Ông Sao Hỏa Đàn Bà Sao Kim", price: 122000, img: src="../assets/images/q4.png", category: "Kỹ năng" },
+        { title: "Muôn Kiếp Nhân Sinh", price: 117600, img: src="../assets/images/q5.png", category: "Văn học" },
+        { title: "Tiếng Hàn Tổng Hợp - Sơ Cấp 1", price: 148500, img: src="../assets/images/q6.png", category: "Ngoại ngữ" },
+        { title: "Đắc Nhân Tâm", price: 56000, img: src="../assets/images/dac-nhan-tam.jpg", category: "Kỹ năng" },
+        { title: "Dạy Con Làm Giàu 01", price: 62000, img: src="../assets/images/q6.png", category: "Kinh tế" },
+        { title: "Hiểu Về Trái Tim", price: 119000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Ngôn Ngữ Cơ Thể", price: 158000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Cảm Ơn Người Lớn", price: 84700, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Thay Đổi Cuộc Sống Với Nhân Số Học", price: 173600, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Khởi Nghiệp Bán Lẻ", price: 125000, img: src="../assets/images/q6.png", category: "Kinh tế" },
+        { title: "Muôn Kiếp Nhân Sinh - Tập 2", price: 187600, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Làm Bạn Với Bầu Trời", price: 169400, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "90% Trẻ Thông Minh Nhờ Trò Chuyện", price: 33000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Tâm Lý Học Tội Phạm", price: 94000, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Thiên Tài Bên Trái, Kẻ Điên Bên Phải", price: 116000, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Bí Mật Của Phan Thiên Ân", price: 69000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Tâm Lý Học Về Tiền", price: 141500, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Cây Chuối Non Đi Giày Xanh", price: 84700, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Có Hai Con Mèo Ngồi Bên Cửa Sổ", price: 77000, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Hành Tinh Của Một Kẻ Nghĩ Nhiều", price: 56000, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Từ Điển Tiếng 'Em'", price: 55000, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Đi Tìm Lẽ Sống", price: 62000, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Tự Học Tiếng Trung Cho Người Mới Bắt Đầu", price: 85500, img: src="../assets/images/q6.png", category: "Ngoại ngữ" },
+        { title: "Cho Tôi Xin Một Vé Đi Tuổi Thơ", price: 69300, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Ông Trăm Tuổi Trèo Qua Cửa Sổ Và Biến Mất", price: 146300, img: src="../assets/images/q6.png", category: "Văn học"},
+        { title: "Biến Mọi Thứ Thành Tiền", price: 109000, img: src="../assets/images/q6.png", category: "Kinh tế" },
+        { title: "Think And Grow Rich", price: 77000, img: src="../assets/images/q6.png", category: "Kinh tế" },
+        { title: "Người Giàu Có Nhất Thành Babylon", price: 74000, img: src="../assets/images/q6.png", category: "Ngoại ngữ" },
+        { title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, img: src="../assets/images/q6.png", category: "Kinh tế" },
+        { title: "Không Sợ Chậm Chỉ Sợ Dừng", price: 84000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Đắc Nhân Tâm (Bìa Cứng)", price: 75000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Vị Thần Của Những Quyết Định", price: 51000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Thỏ Bảy Màu Và Những Người Nghĩ Nó Là Bạn", price: 79000, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Muôn Kiếp Nhân Sinh - Tập 3", price: 152600, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Tô Bình Yên Vẽ Hạnh Phúc", price: 70000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Ghi Chép Pháp Y - Những Cái Chết Bí Ẩn", price: 112500, img: src="../assets/images/q6.png", category: "Trinh thám" },
+        { title: "Không Phải Sói Nhưng Cũng Đừng Là Cừu", price: 89600, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ", price: 85000, img: src="../assets/images/q6.png", category: "Kỹ năng" },
+        { title: "Ở Tiệm Bánh Ngày Mai", price: 92000, img: src="../assets/images/q6.png", category: "Văn học" },
+        { title: "Thao Túng Tâm Lý", price: 118000, img: src="../assets/images/q6.png", category: "Tâm lý" },
+        { title: "Nói Chuyện Là Bản Năng, Giữ Miệng Là Tu Dưỡng", price: 123000, img: src="../assets/images/q48.png", category: "Kỹ năng" },
+    ];
+
+    // 2. BIẾN CẤU HÌNH & QUẢN LÝ
+    const soSachMoiTrang = 16;
+    let trangHienTai = 1;
+    let dsDangHienThi = [...dsSach]; // Danh sách phụ để lọc
+
+    // 3. HÀM HIỂN THỊ SÁCH
+    function hienThiSach(danhSach, trang) {
+        const container = document.querySelector('.book-catalog-grid');
+        if (!container) return; // Nếu mất "kệ sách" thì dừng luôn
+
+        container.innerHTML = "";
+        const batDau = (trang - 1) * soSachMoiTrang;
+        const ketThuc = batDau + soSachMoiTrang;
+        const sachTrongTrang = danhSach.slice(batDau, ketThuc);
+
+        sachTrongTrang.forEach(sach => {
+            const bookHTML = `
+            <div class="book-card">
+                <div class="book-img">
+                    <img src="${sach.img}"
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         alt="${sach.title}"
+                         onerror="this.src='https://via.placeholder.com/200x300?text=Loi+Anh'">
+                </div>
+                <div class="book-content">
+                    <div class="book-title">${sach.title}</div>
+                    <div class="price">${sach.price.toLocaleString('vi-VN')} đ</div>
+                    <button class="btn-buy">Mua ngay</button>
+                </div>
+            </div>`;
+            container.innerHTML += bookHTML;
+        });
+    }
+
+    // 4. HÀM BỘ LỌC VÀ SẮP XẾP
+    function capNhatCuaHang() {
+        let ketQua = [...dsSach];
+
+        // Lọc thể loại
+        const theLoai = document.getElementById('category-select').value;
+        if (theLoai !== "Tất cả") {
+            ketQua = ketQua.filter(s => s.category === theLoai);
+        }
+
+        // Sắp xếp
+        const sapXep = document.getElementById('sort-select').value;
+        if (sapXep === "high-low") ketQua.sort((a, b) => b.price - a.price);
+        else if (sapXep === "low-high") ketQua.sort((a, b) => a.price - b.price);
+
+        dsDangHienThi = ketQua;
+        trangHienTai = 1; // Chọn xong thì về trang 1
+
+        capNhatMauNutPhanTrang();
+        hienThiSach(dsDangHienThi, trangHienTai);
+    }
+
+    // 5. CHỨC NĂNG NÚT PHÂN TRANG
+    const nutPhanTrang = document.querySelectorAll('.page-btn');
+
+    function capNhatMauNutPhanTrang() {
+        nutPhanTrang.forEach(n => n.classList.remove('active'));
+        nutPhanTrang.forEach(n => {
+            if (parseInt(n.innerText) === trangHienTai) n.classList.add('active');
+        });
+    }
+
+    nutPhanTrang.forEach(nut => {
+        nut.addEventListener('click', function() {
+            const giaTriNut = this.innerText;
+
+            if (giaTriNut === "1") trangHienTai = 1;
+            else if (giaTriNut === "2") trangHienTai = 2;
+            else if (giaTriNut === "3") trangHienTai = 3;
+            else if (giaTriNut.includes("Tiếp theo")) {
+                const tongSoTrang = Math.ceil(dsDangHienThi.length / soSachMoiTrang);
+                if (trangHienTai < tongSoTrang) trangHienTai++;
+            }
+
+            capNhatMauNutPhanTrang();
+            hienThiSach(dsDangHienThi, trangHienTai);
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        });
+    });
+
+    // 6. GẮN SỰ KIỆN & KHỞI CHẠY BẮT ĐẦU
+    document.getElementById('sort-select').addEventListener('change', capNhatCuaHang);
+    document.getElementById('category-select').addEventListener('change', capNhatCuaHang);
+
+    // Ra lệnh máy vẽ sách ra lúc mới mở web
+    hienThiSach(dsDangHienThi, trangHienTai);
+
+</script>
 </body>
 </html>
