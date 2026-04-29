@@ -320,3 +320,86 @@ nav a:hover {
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     transform: translateY(-2px); /* Hiệu ứng nảy lên một chút */
 }
+/* --- Style cho trang Danh mục sách --- */
+
+/* 1. Thanh bộ lọc (Filter Bar) */
+.filter-bar {
+    display: flex;
+    gap: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-item label {
+    font-weight: 700;
+    color: #475569;
+}
+
+.filter-item select {
+    padding: 8px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    background-color: #f8fafc;
+}
+
+/* 2. Lưới sách 4 cột (Grid 4x4) */
+.book-catalog-grid {
+    display: grid;
+    /* Chia làm 4 cột bằng nhau */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px; /* Khoảng cách giữa các quyển sách */
+}
+
+/* 3. Phân trang (Pagination) */
+.pagination {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-bottom: 50px;
+}
+
+.page-btn {
+    padding: 10px 20px;
+    border: 1px solid #2563eb;
+    background: white;
+    color: #2563eb;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.page-btn.active, .page-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+/* Responsive: Trên máy tính bảng hiện 2 cột, điện thoại hiện 1 cột */
+@media (max-width: 1024px) {
+    .book-catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .book-catalog-grid {
+        grid-template-columns: 1fr;
+    }
+    .filter-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
