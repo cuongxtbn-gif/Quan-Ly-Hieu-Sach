@@ -116,9 +116,15 @@
     let dsDangHienThi = [...dsSach]; // Danh sách phụ để lọc
 
     // 3. HÀM HIỂN THỊ SÁCH
+    // Hàm siêu tốc: Tự động tạo ID từ Tên Sách (Loại bỏ dấu tiếng Việt, thay dấu cách bằng dấu gạch ngang)
+    function taoIdTuTenSach(str) {
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, '-').trim();
+    }
+
+    // 3. HÀM HIỂN THỊ SÁCH (Đã được nâng cấp nút bấm)
     function hienThiSach(danhSach, trang) {
         const container = document.querySelector('.book-catalog-grid');
-        if (!container) return; // Nếu mất "kệ sách" thì dừng luôn
+        if (!container) return;
 
         container.innerHTML = "";
         const batDau = (trang - 1) * soSachMoiTrang;
@@ -126,18 +132,18 @@
         const sachTrongTrang = danhSach.slice(batDau, ketThuc);
 
         sachTrongTrang.forEach(sach => {
+            // Tự động tạo ra idSach từ title
+            const idSach = taoIdTuTenSach(sach.title);
+
             const bookHTML = `
             <div class="book-card">
                 <div class="book-img">
-                    <img src="${sach.img}"
-                         style="width: 100%; height: 100%; object-fit: cover;"
-                         alt="${sach.title}"
-                         onerror="this.src='https://via.placeholder.com/200x300?text=Loi+Anh'">
+                    <img src="${sach.img}" style="width: 100%; height: 100%; object-fit: cover;" alt="${sach.title}">
                 </div>
                 <div class="book-content">
                     <div class="book-title">${sach.title}</div>
                     <div class="price">${sach.price.toLocaleString('vi-VN')} đ</div>
-                    <button class="btn-buy">Mua ngay</button>
+                    <button class="btn-buy" onclick="window.location.href='chi-tiet-sach.html?id=${idSach}'">Mua ngay</button>
                 </div>
             </div>`;
             container.innerHTML += bookHTML;
