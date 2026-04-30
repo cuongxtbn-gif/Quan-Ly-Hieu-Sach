@@ -1,10 +1,304 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - ADC Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .cart-container { max-width: 950px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;}
+        h1 { border-bottom: 2px solid #2563eb; padding-bottom: 10px; color: #333; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; vertical-align: middle; }
+        th { background-color: #f8f9fa; }
+        .item-img { width: 50px; height: 70px; object-fit: cover; border-radius: 4px; vertical-align: middle; margin-right: 15px;}
+        
+        .qty-box { display: flex; align-items: center; gap: 5px; }
+        .qty-btn { width: 28px; height: 28px; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .qty-btn:hover { background: #eee; }
+        .qty-input { width: 40px; height: 24px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .btn-delete:hover { background: #dc2626; }
+
+        .checkout-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .total-price { font-size: 1.2em; font-weight: bold; color: #e11d48; }
+        
+        .btn-checkout { background: #ea580c; color: white; border: none; padding: 12px 25px; font-size: 1em; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-checkout:hover { background: #c2410c; }
+        
+        /* Modal Thanh Toán */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;}
+        .modal-content { background: #fff; padding: 30px; border-radius: 8px; width: 450px; text-align: left; }
+        .close { float: right; cursor: pointer; font-size: 1.5em; font-weight: bold; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { font-weight: bold; display: block; margin-bottom: 5px; color: #333; font-size: 0.9em;}
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit;}
+        
+        .radio-group { display: flex; justify-content: space-around; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #eee;}
+        .qr-box { display: none; margin: 10px auto; width: 160px; height: 160px; background: #eee; line-height: 160px; font-weight: bold; border: 2px dashed #ccc; text-align: center; }
+        
+        .btn-confirm { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1em; font-weight: bold;}
+        .btn-confirm:hover { background: #1d4ed8; }
+
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #000; }
+        .status-pending { background: #f1c40f; }
+        .status-approved { background: #3498db; color: white; }
+    </style>
 </head>
 <body>
 
+<div class="cart-container">
+    <h1>Giỏ Hàng</h1>
+    <a href="index.html" style="text-decoration: none; color: #2563eb;">&larr; Trở về trang chủ</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;"><input type="checkbox" id="selectAll"> Tất cả</th>
+                <th style="width: 35%;">Sản phẩm</th>
+                <th style="width: 15%;">Đơn giá</th>
+                <th style="width: 15%;">Số lượng</th>
+                <th style="width: 15%;">Thành tiền</th>
+                <th style="width: 10%;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="cart-body"></tbody>
+    </table>
+
+    <div class="checkout-bar">
+        <div><input type="checkbox" id="selectAllBottom"> <label for="selectAllBottom">Chọn tất cả</label></div>
+        <div class="total-price" id="totalPrice">Tổng thanh toán (0 sản phẩm): 0đ</div>
+        <button class="btn-checkout" id="btnShowCheckout">Đặt hàng</button>
+    </div>
+</div>
+
+<div class="cart-container">
+    <h2 style="margin-top: 0; color: #2c3e50;">📦 Theo dõi đơn hàng của bạn</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mã Đơn</th>
+                <th>Ngày Đặt</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+            </tr>
+        </thead>
+        <tbody id="tracking-body">
+            </tbody>
+    </table>
+</div>
+
+<div class="modal" id="checkoutModal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2 style="margin-top: 0; text-align: center;">Thông Tin Đặt Hàng</h2>
+        <p id="modalTotal" style="font-weight: bold; color: #e11d48; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 15px; text-align: center;"></p>
+        
+        <div class="form-group">
+            <label for="txtName">Họ và tên người nhận (*):</label>
+            <input type="text" id="txtName" placeholder="Nhập họ tên...">
+        </div>
+        <div class="form-group">
+            <label for="txtPhone">Số điện thoại (*):</label>
+            <input type="text" id="txtPhone" placeholder="Ví dụ: 0912345678...">
+        </div>
+        <div class="form-group">
+            <label for="txtAddress">Địa chỉ giao hàng (*):</label>
+            <textarea id="txtAddress" rows="2" placeholder="Số nhà, Tên đường, Phường/Xã..."></textarea>
+        </div>
+
+        <div style="font-weight: bold; color: #333;">Phương thức thanh toán:</div>
+        <div class="radio-group">
+            <label><input type="radio" name="payMethod" value="cod" checked> Thanh toán trực tiếp</label>
+            <label><input type="radio" name="payMethod" value="qr"> Quét mã QR</label>
+        </div>
+        <div id="qrArea" class="qr-box">[ MÃ QR ]</div>
+
+        <button class="btn-confirm" id="btnConfirmOrder">Xác Nhận Đặt Hàng</button>
+    </div>
+</div>
+
+<script>
+    const cartBody = document.getElementById('cart-body');
+    const trackingBody = document.getElementById('tracking-body');
+    const selectAll = document.getElementById('selectAll');
+    const selectAllBottom = document.getElementById('selectAllBottom');
+    const totalPriceEl = document.getElementById('totalPrice');
+    
+    let checkedIndexes = new Set();
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let currentTotalToPay = 0;
+
+    function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
+
+    function renderCart() {
+        cartBody.innerHTML = '';
+        if(cart.length === 0) {
+            cartBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">Giỏ hàng của bạn đang trống</td></tr>';
+            selectAll.checked = false; selectAllBottom.checked = false;
+            calculateTotal();
+            return;
+        }
+
+        cart.forEach((item, index) => {
+            const isChecked = checkedIndexes.has(index) ? 'checked' : '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="item-check" data-index="${index}" ${isChecked}></td>
+                <td><img src="${item.image}" class="item-img">${item.title}</td>
+                <td>${item.price.toLocaleString('vi-VN')}đ</td>
+                <td>
+                    <div class="qty-box">
+                        <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                        <input type="text" class="qty-input" value="${item.quantity}" readonly>
+                        <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                    </div>
+                </td>
+                <td style="font-weight:bold; color: #e11d48;">${(item.price * item.quantity).toLocaleString('vi-VN')}đ</td>
+                <td><button class="btn-delete" onclick="removeItem(${index})">Xóa</button></td>
+            `;
+            cartBody.appendChild(tr);
+        });
+        attachCheckboxListeners(); calculateTotal();
+    }
+
+    // Hiển thị lịch sử đơn hàng
+    function renderTrackingOrders() {
+        let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+        trackingBody.innerHTML = '';
+        if(orders.length === 0) {
+            trackingBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Bạn chưa có đơn hàng nào</td></tr>';
+            return;
+        }
+        
+        // Hiển thị đơn hàng mới nhất lên đầu
+        orders.reverse().forEach(order => {
+            let statusClass = order.status === 'Chờ xác nhận' ? 'status-pending' : 'status-approved';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${order.id}</strong></td>
+                <td>${order.date}</td>
+                <td style="color: #e11d48; font-weight: bold;">${order.total.toLocaleString('vi-VN')}đ</td>
+                <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+            `;
+            trackingBody.appendChild(tr);
+        });
+    }
+
+    window.updateQty = function(index, change) {
+        if (cart[index].quantity + change > 0) {
+            cart[index].quantity += change;
+            saveCart(); renderCart();
+        }
+    };
+
+    window.removeItem = function(index) {
+        if(confirm('Xóa sản phẩm này?')) {
+            cart.splice(index, 1);
+            let newChecked = new Set();
+            checkedIndexes.forEach(idx => {
+                if (idx < index) newChecked.add(idx);
+                if (idx > index) newChecked.add(idx - 1);
+            });
+            checkedIndexes = newChecked;
+            saveCart(); renderCart();
+        }
+    };
+
+    function calculateTotal() {
+        const checkboxes = document.querySelectorAll('.item-check');
+        let total = 0; let count = 0;
+        checkboxes.forEach((cb) => {
+            if(cb.checked) {
+                const index = parseInt(cb.getAttribute('data-index'));
+                total += cart[index].price * cart[index].quantity;
+                count++;
+            }
+        });
+        currentTotalToPay = total;
+        totalPriceEl.innerText = `Tổng thanh toán (${count} sản phẩm): ${total.toLocaleString('vi-VN')}đ`;
+        return { total, count };
+    }
+
+    function attachCheckboxListeners() {
+        document.querySelectorAll('.item-check').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                e.target.checked ? checkedIndexes.add(index) : checkedIndexes.delete(index);
+                if(!e.target.checked) { selectAll.checked = false; selectAllBottom.checked = false; }
+                calculateTotal();
+            });
+        });
+    }
+
+    function handleSelectAll(e) {
+        const isChecked = e.target.checked;
+        selectAll.checked = isChecked; selectAllBottom.checked = isChecked;
+        checkedIndexes.clear();
+        if (isChecked) cart.forEach((_, index) => checkedIndexes.add(index));
+        renderCart();
+    }
+
+    selectAll.addEventListener('change', handleSelectAll);
+    selectAllBottom.addEventListener('change', handleSelectAll);
+
+    // XỬ LÝ ĐẶT HÀNG
+    const modal = document.getElementById('checkoutModal');
+    document.getElementById('btnShowCheckout').addEventListener('click', () => {
+        if (checkedIndexes.size === 0) return alert('Vui lòng chọn ít nhất 1 sản phẩm!');
+        document.getElementById('modalTotal').innerText = `Tổng tiền cần thanh toán: ${currentTotalToPay.toLocaleString('vi-VN')}đ`;
+        modal.style.display = 'flex';
+    });
+    document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+
+    document.getElementsByName('payMethod').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('qrArea').style.display = e.target.value === 'qr' ? 'block' : 'none';
+        });
+    });
+
+    document.getElementById('btnConfirmOrder').addEventListener('click', () => {
+        const name = document.getElementById('txtName').value.trim();
+        const phone = document.getElementById('txtPhone').value.trim();
+        const address = document.getElementById('txtAddress').value.trim();
+        
+        if (!name || !phone || !address) {
+            alert('Vui lòng nhập đầy đủ Tên, Số điện thoại và Địa chỉ!');
+            return;
+        }
+
+        // TẠO ĐƠN HÀNG VÀ ĐẨY LÊN "SERVER" LOCALSTORAGE
+        const newOrder = {
+            id: '#ORD-' + Math.floor(1000 + Math.random() * 9000),
+            date: new Date().toLocaleDateString('vi-VN'),
+            customerName: name,
+            phone: phone,
+            address: address,
+            total: currentTotalToPay,
+            status: 'Chờ xác nhận' // Mặc định là chờ admin duyệt
+        };
+
+        let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+        orders.push(newOrder);
+        localStorage.setItem('adc_orders', JSON.stringify(orders)); // Đẩy cho Admin
+        
+        alert('Đặt hàng thành công! Đơn hàng sẽ được chuyển đến Admin.');
+        
+        // Cập nhật lại giỏ hàng
+        cart = cart.filter((_, index) => !checkedIndexes.has(index));
+        checkedIndexes.clear(); saveCart();
+        
+        modal.style.display = 'none';
+        renderCart();
+        renderTrackingOrders(); // Load lại bảng theo dõi
+    });
+
+    renderCart();
+    renderTrackingOrders();
+</script>
 </body>
 </html>
