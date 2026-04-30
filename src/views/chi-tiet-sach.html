@@ -1,10 +1,634 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sách - Bookstore</title>
+    <link rel="stylesheet" href="../assets/css/dinh-dang.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<header>
+    <div class="logo">🐵 BOOKSTORE</div>
+    <div class="search-bar" style="position: relative;">
+        <!-- Bắt buộc phải có id="search-input" -->
+        <input type="text" id="search-input" placeholder="Tìm kiếm sách bạn yêu thích..." autocomplete="off">
+        <!-- Bắt buộc phải có hộp này để chứa gợi ý -->
+        <div id="search-suggestions" class="suggestions-box"></div>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="danh-muc-sach.html">Sách</a></li>
+            <li><a href="gio-hang.html">Giỏ hàng</a></li>
+            <li id="menu-login"><a href="dang-nhap.html">Đăng nhập</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="container breadcrumb">
+    <a href="index.html">Trang chủ</a> > <a href="danh-muc-sach.html">Sách</a> > <span id="bc-title" style="color: #f39c12; font-weight: bold;">Đang tải...</span>
+</div>
+
+<div class="container product-detail-wrapper">
+    <div class="product-gallery">
+        <img id="detail-img" src="" alt="Ảnh bìa sách">
+    </div>
+
+    <div class="product-info-main">
+        <h1 id="detail-title">Đang tải tên sách...</h1>
+
+        <div class="product-meta">
+            <p>Nhà cung cấp: <span id="detail-supplier" class="highlight-text">Fahasa</span></p>
+            <p>Tác giả: <span id="detail-author">Đang cập nhật</span></p>
+            <p>Nhà xuất bản: <span id="detail-publisher">Đang cập nhật</span></p>
+            <p>Hình thức bìa: <span id="detail-cover-type">Bìa Mềm</span></p>
+        </div>
+
+        <div class="product-price-box">
+            <span id="detail-price" class="current-price">0 đ</span>
+        </div>
+
+        <div class="purchase-actions">
+            <div class="quantity-control">
+                <span style="font-weight: bold; color: #2c3e50;">Số lượng:</span>
+                <button class="qty-btn" onclick="changeQty(-1)">-</button>
+                <input type="number" id="qty-input" value="1" min="1">
+                <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-add-cart" onclick="addToCart()">Thêm vào giỏ hàng</button>
+                <button class="btn-buy-now" onclick="openBuyModal()">Mua ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container product-specs-wrapper">
+    <h2>Thông tin chi tiết</h2>
+    <table class="specs-table">
+        <tr><td class="spec-label">Mã hàng</td><td id="spec-id"></td></tr>
+        <tr><td class="spec-label">Thể loại</td><td id="spec-category"></td></tr>
+        <tr><td class="spec-label">Tác giả</td><td id="spec-author-table"></td></tr>
+        <tr><td class="spec-label">Nhà Xuất Bản</td><td id="spec-publisher"></td></tr>
+        <tr><td class="spec-label">Năm XB</td><td id="spec-year"></td></tr>
+        <tr><td class="spec-label">Trọng lượng (gr)</td><td id="spec-weight"></td></tr>
+        <tr><td class="spec-label">Kích thước (cm)</td><td id="spec-size"></td></tr>
+        <tr><td class="spec-label">Số trang</td><td id="spec-pages"></td></tr>
+    </table>
+
+    <h2 style="margin-top: 40px;">Mô tả sản phẩm</h2>
+    <div class="product-description">
+        <h3 id="desc-title" style="margin-bottom: 15px; color: #2c3e50;"></h3>
+        <p id="desc-content"></p>
+    </div>
+</div>
+
+<script>
+    // 1. DATABASE GIẢ LẬP (Lấy từ mảng dsSach của bạn và buff thêm chi tiết)
+    // =========================================================================
+    // DATABASE GIẢ LẬP SIÊU TO KHỔNG LỒ (MOCK DATA)
+    // Tích hợp toàn bộ dữ liệu từ index.html và danh-muc-sach.html
+    // =========================================================================
+
+    const bookDatabase = {
+        // ---- NHÓM SÁCH NỔI BẬT TỪ TRANG CHỦ ----
+        "ba-tuoc-monte-cristo": {
+            id: "ba-tuoc-monte-cristo", title: "Bá tước Monte Cristo", price: 185000, img: "../assets/images/ba-tuoc-monte-cristo.jpg", category: "Văn học",
+            author: "Alexandre Dumas", publisher: "NXB Văn Học", year: 2019, weight: 650, size: "24 x 16", pages: 800,
+            description: "Câu chuyện về sự phản bội, tù đày, trốn thoát và sự trả thù hoàn hảo của Edmond Dantès. Một tượng đài của văn học Pháp."
+        },
+        "giet-con-chim-nhai": {
+            id: "giet-con-chim-nhai", title: "Giết con chim nhại", price: 210000, img: "../assets/images/giet-con-chim-nhai.jpg", category: "Văn học",
+            author: "Harper Lee", publisher: "NXB Tổng Hợp TPHCM", year: 2021, weight: 350, size: "20 x 13", pages: 416,
+            description: "Một câu chuyện kinh điển về định kiến chủng tộc và sự đánh mất tuổi thơ trong trắng, qua góc nhìn của một cô bé ở miền Nam nước Mỹ."
+        },
+        "hai-so-phan": {
+            id: "hai-so-phan", title: "Hai số phận", price: 320000, img: "../assets/images/hai-so-phan.jpg", category: "Văn học",
+            author: "Jeffrey Archer", publisher: "NXB Hội Nhà Văn", year: 2020, weight: 550, size: "23 x 15", pages: 680,
+            description: "Cuộc đối đầu vĩ đại giữa hai con người sinh ra cùng một ngày, một giàu sang tột đỉnh, một nghèo hèn bần cùng, nhưng có chung một tham vọng."
+        },
+        "khong-gia-dinh": {
+            id: "khong-gia-dinh", title: "Không gia đình", price: 450000, img: "../assets/images/khong-gia-dinh.jpg", category: "Văn học",
+            author: "Hector Malot", publisher: "NXB Kim Đồng", year: 2022, weight: 700, size: "24 x 16", pages: 720,
+            description: "Hành trình đầy gian truân nhưng ấm áp tình người của cậu bé mồ côi Rê-mi cùng gánh xiếc thú rong của cụ Vi-ta-li."
+        },
+        "phia-sau-nghi-can-x": {
+            id: "phia-sau-nghi-can-x", title: "Phía sau nghi can X", price: 230000, img: "../assets/images/phia-sau-nghi-can-x.png", category: "Trinh thám",
+            author: "Keigo Higashino", publisher: "NXB Hội Nhà Văn", year: 2020, weight: 400, size: "20.5 x 14", pages: 396,
+            description: "Một vụ án mạng tưởng chừng đơn giản nhưng lại ẩn chứa một bài toán logic không có lời giải của một thiên tài toán học."
+        },
+        "rung-nauy": {
+            id: "rung-nauy", title: "Rừng Nauy", price: 240000, img: "../assets/images/rung-nauy.png", category: "Văn học",
+            author: "Haruki Murakami", publisher: "NXB Hội Nhà Văn", year: 2021, weight: 420, size: "20.5 x 14", pages: 540,
+            description: "Khúc vãn ca tuổi thanh xuân đầy ám ảnh về tình yêu, cái chết và sự cô đơn của những người trẻ tuổi ở Tokyo những năm 60."
+        },
+        "bo-gia": {
+            id: "bo-gia", title: "Bố Già", price: 105000, img: "../assets/images/bo-gia.png", category: "Văn học",
+            author: "Mario Puzo", publisher: "NXB Văn Học", year: 2018, weight: 450, size: "21 x 14", pages: 512,
+            description: "Bức tranh hoành tráng về thế giới ngầm Mafia, xoay quanh gia đình Corleone quyền lực và đầy rẫy những quy tắc khắc nghiệt của giới giang hồ."
+        },
+        "nhung-nguoi-khon-kho": {
+            id: "nhung-nguoi-khon-kho", title: "Những người khốn khổ", price: 285000, img: "../assets/images/nhung-nguoi-khon-kho.png", category: "Văn học",
+            author: "Victor Hugo", publisher: "NXB Văn Học", year: 2017, weight: 800, size: "24 x 16", pages: 1100,
+            description: "Bản trường ca vĩ đại về tình yêu thương con người và sự cứu rỗi linh hồn giữa nước Pháp thế kỷ 19 đầy biến động."
+        },
+        "phia-tay-khong-co-gi-la": {
+            id: "phia-tay-khong-co-gi-la", title: "Phía tây không có gì lạ", price: 50000, img: "../assets/images/phia-tay-khong-co-gi-la.png", category: "Văn học",
+            author: "Erich Maria Remarque", publisher: "NXB Văn Học", year: 2019, weight: 300, size: "20 x 13", pages: 280,
+            description: "Lời kết án đanh thép sự tàn bạo của chiến tranh thông qua cái nhìn của một người lính trẻ trên chiến trường."
+        },
+        "tuoi-tre-dang-gia-bao-nhieu": {
+            id: "tuoi-tre-dang-gia-bao-nhieu", title: "Tuổi trẻ đáng giá bao nhiêu", price: 80000, img: "../assets/images/tuoi-tre-dang-gia-bao-nhieu.png", category: "Kỹ năng",
+            author: "Rosie Nguyễn", publisher: "NXB Hội Nhà Văn", year: 2021, weight: 310, size: "20 x 13", pages: 290,
+            description: "Cuốn sách thức tỉnh những người trẻ đang chông chênh, giúp bạn tận dụng tối đa những năm tháng thanh xuân rực rỡ nhất."
+        },
+
+        // ---- NHÓM TỪ DANH MỤC SÁCH (dsSach) ----
+        "cay-cam-ngot-cua-toi": {
+            id: "cay-cam-ngot-cua-toi", title: "Cây Cam Ngọt Của Tôi", price: 81000, img: "../assets/images/cay-cam-ngot-cua-toi.png", category: "Văn học",
+            author: "José Mauro de Vasconcelos", publisher: "NXB Hội Nhà Văn", year: 2020, weight: 280, size: "20 x 14.5", pages: 244,
+            description: "Vị chua chát của cái nghèo hòa trộn với vị ngọt ngào khi khám phá ra những điều khiến cuộc đời này đáng sống."
+        },
+        "khong-diet-khong-sinh-dung-so-hai": {
+            id: "khong-diet-khong-sinh-dung-so-hai", title: "Không Diệt Không Sinh Đừng Sợ Hãi", price: 82500, img: "../assets/images/q2.png", category: "Kỹ năng",
+            author: "Thích Nhất Hạnh", publisher: "NXB Tổng Hợp TPHCM", year: 2021, weight: 300, size: "20.5 x 13", pages: 256,
+            description: "Thiền sư Thích Nhất Hạnh mang đến một góc nhìn thấu suốt về sự sống, cái chết, giúp chúng ta vượt qua nỗi sợ hãi tột cùng."
+        },
+        "khi-hoi-tho-hoa-thinh-khong": {
+            id: "khi-hoi-tho-hoa-thinh-khong", title: "Khi Hơi Thở Hóa Thinh Không", price: 81750, img: "../assets/images/q3.png", category: "Văn học",
+            author: "Paul Kalanithi", publisher: "NXB Lao Động", year: 2020, weight: 290, size: "20.5 x 13.5", pages: 250,
+            description: "Hồi ký đầy xúc động của một bác sĩ phẫu thuật thần kinh tài năng đối mặt với căn bệnh ung thư phổi giai đoạn cuối."
+        },
+        "dan-ong-sao-hoa-dan-ba-sao-kim": {
+            id: "dan-ong-sao-hoa-dan-ba-sao-kim", title: "Đàn Ông Sao Hỏa Đàn Bà Sao Kim", price: 122000, img: "../assets/images/q4.png", category: "Kỹ năng",
+            author: "John Gray", publisher: "NXB Trẻ", year: 2019, weight: 380, size: "21 x 14", pages: 350,
+            description: "Cuốn sách kinh điển giúp giải mã sự khác biệt tâm lý giữa nam và nữ, chìa khóa để giữ gìn hạnh phúc lứa đôi."
+        },
+        "muon-kiep-nhan-sinh": {
+            id: "muon-kiep-nhan-sinh", title: "Muôn Kiếp Nhân Sinh", price: 117600, img: "../assets/images/q5.png", category: "Văn học",
+            author: "Nguyên Phong", publisher: "NXB Tổng Hợp TPHCM", year: 2020, weight: 450, size: "21 x 14.5", pages: 400,
+            description: "Bức tranh kỳ vĩ về luật luân hồi nhân quả, đưa người đọc trải nghiệm các kiếp sống từ văn minh Atlantis đến Ai Cập cổ đại."
+        },
+        "tieng-han-tong-hop-so-cap-1": {
+            id: "tieng-han-tong-hop-so-cap-1", title: "Tiếng Hàn Tổng Hợp - Sơ Cấp 1", price: 148500, img: "../assets/images/q6.png", category: "Ngoại ngữ",
+            author: "Nhiều Tác Giả", publisher: "NXB Đại Học Quốc Gia", year: 2022, weight: 500, size: "26 x 19", pages: 380,
+            description: "Giáo trình chuẩn mực nhất dành cho người Việt Nam bắt đầu học tiếng Hàn Quốc."
+        },
+        "dac-nhan-tam": {
+            id: "dac-nhan-tam", title: "Đắc Nhân Tâm", price: 56000, img: "../assets/images/dac-nhan-tam.jpg", category: "Kỹ năng",
+            author: "Dale Carnegie", publisher: "NXB Tổng Hợp TPHCM", year: 2021, weight: 350, size: "21 x 14.5", pages: 320,
+            description: "Nghệ thuật thu phục lòng người, cuốn sách kỹ năng giao tiếp và ứng xử nổi tiếng nhất thế giới."
+        },
+        "day-con-lam-giau-01": {
+            id: "day-con-lam-giau-01", title: "Dạy Con Làm Giàu 01", price: 62000, img: "../assets/images/q8.png", category: "Kinh tế",
+            author: "Robert T. Kiyosaki", publisher: "NXB Trẻ", year: 2018, weight: 300, size: "20.5 x 13", pages: 250,
+            description: "Cha giàu cha nghèo - Bài học tài chính cá nhân vỡ lòng thay đổi tư duy của hàng triệu người về tiền bạc."
+        },
+        "hieu-ve-trai-tim": {
+            id: "hieu-ve-trai-tim", title: "Hiểu Về Trái Tim", price: 119000, img: "../assets/images/q9.png", category: "Kỹ năng",
+            author: "Thích Minh Niệm", publisher: "NXB Trẻ", year: 2019, weight: 400, size: "21 x 13", pages: 480,
+            description: "Những bài luận sâu sắc về tâm lý con người, giúp chữa lành những tổn thương và tìm lại bình yên trong tâm hồn."
+        },
+        "ngon-ngu-co-the": {
+            id: "ngon-ngu-co-the", title: "Ngôn Ngữ Cơ Thể", price: 158000, img: "../assets/images/q10.png", category: "Kỹ năng",
+            author: "Allan Pease", publisher: "NXB Phụ Nữ", year: 2020, weight: 350, size: "21 x 14", pages: 388,
+            description: "Cách đọc vị suy nghĩ của người khác thông qua cử chỉ, ánh mắt và điệu bộ một cách chính xác nhất."
+        },
+        "cam-on-nguoi-lon": {
+            id: "cam-on-nguoi-lon", title: "Cảm Ơn Người Lớn", price: 84700, img: "../assets/images/q11.png", category: "Văn học",
+            author: "Nguyễn Nhật Ánh", publisher: "NXB Trẻ", year: 2018, weight: 280, size: "20 x 13", pages: 260,
+            description: "Phần tiếp theo của 'Cho tôi xin một vé đi tuổi thơ', tiếp tục những suy ngẫm dí dỏm nhưng sâu cay về thế giới người lớn."
+        },
+        "thay-doi-cuoc-song-voi-nhan-so-hoc": {
+            id: "thay-doi-cuoc-song-voi-nhan-so-hoc", title: "Thay Đổi Cuộc Sống Với Nhân Số Học", price: 173600, img: "../assets/images/q12.png", category: "Kỹ năng",
+            author: "Lê Đỗ Quỳnh Hương", publisher: "NXB Tổng Hợp", year: 2021, weight: 400, size: "21 x 14.5", pages: 350,
+            description: "Khám phá bản thân và định hướng tương lai thông qua những con số gắn liền với ngày sinh của bạn."
+        },
+        "khoi-nghiep-ban-le": {
+            id: "khoi-nghiep-ban-le", title: "Khởi Nghiệp Bán Lẻ", price: 125000, img: "../assets/images/q13.png", category: "Kinh tế",
+            author: "Trần Thanh Phong", publisher: "NXB Công Thương", year: 2020, weight: 320, size: "20 x 14", pages: 290,
+            description: "Bí quyết mở chuỗi cửa hàng bán lẻ thành công, từ khâu chọn mặt bằng đến quản lý nhân sự và dòng tiền."
+        },
+        "muon-kiep-nhan-sinh-tap-2": {
+            id: "muon-kiep-nhan-sinh-tap-2", title: "Muôn Kiếp Nhân Sinh - Tập 2", price: 187600, img: "../assets/images/q14.png", category: "Văn học",
+            author: "Nguyên Phong", publisher: "NXB Tổng Hợp TPHCM", year: 2021, weight: 480, size: "21 x 14.5", pages: 420,
+            description: "Tiếp tục cuộc hành trình khám phá các nền văn minh tiền sử và những thông điệp tâm linh về hiện tại và tương lai của nhân loại."
+        },
+        "lam-ban-voi-bau-troi": {
+            id: "lam-ban-voi-bau-troi", title: "Làm Bạn Với Bầu Trời", price: 169400, img: "../assets/images/q15.png", category: "Văn học",
+            author: "Nguyễn Nhật Ánh", publisher: "NXB Trẻ", year: 2019, weight: 250, size: "20 x 13", pages: 220,
+            description: "Câu chuyện trong trẻo về tình bạn và lòng nhân ái qua góc nhìn của một cậu bé tật nguyền luôn hướng tâm hồn lên bầu trời xanh."
+        },
+        "tam-ly-hoc-toi-pham": {
+            id: "tam-ly-hoc-toi-pham", title: "Tâm Lý Học Tội Phạm", price: 94000, img: "../assets/images/q17.png", category: "Tâm lý",
+            author: "Stanton E. Samenow", publisher: "NXB Dân Trí", year: 2021, weight: 330, size: "20.5 x 14", pages: 310,
+            description: "Phân tích tư duy và động cơ đằng sau những hành vi phạm tội, giúp chúng ta hiểu rõ phần tối trong tâm lý con người."
+        },
+        "thien-tai-ben-trai-ke-dien-ben-phai": {
+            id: "thien-tai-ben-trai-ke-dien-ben-phai", title: "Thiên Tài Bên Trái, Kẻ Điên Bên Phải", price: 116000, img: "../assets/images/q18.png", category: "Tâm lý",
+            author: "Cao Minh", publisher: "NXB Thế Giới", year: 2018, weight: 400, size: "21 x 14.5", pages: 400,
+            description: "Góc nhìn thế giới độc đáo và kỳ dị thông qua các cuộc phỏng vấn những bệnh nhân tâm thần có tư duy siêu việt."
+        },
+        "tam-ly-hoc-ve-tien": {
+            id: "tam-ly-hoc-ve-tien", title: "Tâm Lý Học Về Tiền", price: 141500, img: "../assets/images/q20.png", category: "Tâm lý",
+            author: "Morgan Housel", publisher: "NXB Dân Trí", year: 2021, weight: 300, size: "20.5 x 13", pages: 312,
+            description: "Tiền bạc không phải là thứ bạn biết, mà là cách bạn hành xử. Cuốn sách gỡ rối tư duy về sự giàu có, tham lam và hạnh phúc."
+        },
+        "cay-chuoi-non-di-giay-xanh": {
+            id: "cay-chuoi-non-di-giay-xanh", title: "Cây Chuối Non Đi Giày Xanh", price: 84700, img: "../assets/images/q21.png", category: "Văn học",
+            author: "Nguyễn Nhật Ánh", publisher: "NXB Trẻ", year: 2017, weight: 290, size: "20 x 13", pages: 300,
+            description: "Một vùng ký ức êm đềm ở thị trấn miền quê, nơi có những rung động đầu đời ngốc nghếch và tình bạn tuổi ấu thơ."
+        },
+        "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau": {
+            id: "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau", title: "Tự Học Tiếng Trung Cho Người Mới Bắt Đầu", price: 85500, img: "../assets/images/q26.png", category: "Ngoại ngữ",
+            author: "MCBooks", publisher: "NXB Hồng Đức", year: 2022, weight: 350, size: "24 x 17", pages: 280,
+            description: "Cuốn sách được thiết kế đặc biệt dành riêng cho những người mới bắt đầu học tiếng Trung, kèm lộ trình bài bản."
+        },
+        "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat": {
+            id: "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat", title: "Ông Trăm Tuổi Trèo Qua Cửa Sổ Và Biến Mất", price: 146300, img: "../assets/images/q28.png", category: "Văn học",
+            author: "Jonas Jonasson", publisher: "NXB Trẻ", year: 2019, weight: 450, size: "20 x 13.5", pages: 504,
+            description: "Cuộc phiêu lưu điên rồ và vô cùng hài hước của cụ già 100 tuổi bỏ trốn khỏi viện dưỡng lão."
+        },
+        "nguoi-dua-dieu": {
+            id: "nguoi-dua-dieu", title: "Người Đua Diều", price: 146300, img: "../assets/images/q29.png", category: "Văn học",
+            author: "Khaled Hosseini", publisher: "NXB Hội Nhà Văn", year: 2018, weight: 420, size: "20.5 x 14", pages: 440,
+            description: "Câu chuyện đau xót về tình bạn, sự phản bội và cái giá của sự chuộc lỗi lấy bối cảnh đất nước Afghanistan hoang tàn."
+        },
+        "think-and-grow-rich": {
+            id: "think-and-grow-rich", title: "Think And Grow Rich", price: 77000, img: "../assets/images/q31.png", category: "Kinh tế",
+            author: "Napoleon Hill", publisher: "NXB Tổng Hợp", year: 2020, weight: 340, size: "21 x 14.5", pages: 380,
+            description: "13 nguyên tắc nghĩ giàu làm giàu đã thay đổi cuộc đời của hàng triệu triệu phú trên toàn thế giới."
+        },
+        "nguoi-giau-co-nhat-thanh-babylon": {
+            id: "nguoi-giau-co-nhat-thanh-babylon", title: "Người Giàu Có Nhất Thành Babylon", price: 74000, img: "../assets/images/q32.png", category: "Kinh tế",
+            author: "George S. Clason", publisher: "NXB Tổng Hợp", year: 2021, weight: 200, size: "20.5 x 13", pages: 180,
+            description: "Cách chữa trị những chiếc ví xẹp lép thông qua những câu chuyện ngụ ngôn tài chính cổ xưa từ thời Babylon."
+        },
+        "lam-giau-tu-chung-khoan": {
+            id: "lam-giau-tu-chung-khoan", title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, img: "../assets/images/q34.png", category: "Kinh tế",
+            author: "William J. O'Neil", publisher: "NXB Kinh Tế", year: 2022, weight: 900, size: "24 x 16", pages: 800,
+            description: "Hệ thống đầu tư CANSLIM huyền thoại giúp bạn kiếm tiền trên thị trường chứng khoán một cách có kỷ luật."
+        },
+        "ghi-chep-phap-y-nhung-cai-chet-bi-an": {
+            id: "ghi-chep-phap-y-nhung-cai-chet-bi-an", title: "Ghi Chép Pháp Y - Những Cái Chết Bí Ẩn", price: 112500, img: "../assets/images/q41.png", category: "Trinh thám",
+            author: "Pháp y Tần Minh", publisher: "NXB Thanh Niên", year: 2021, weight: 350, size: "20.5 x 14", pages: 320,
+            description: "Hồ sơ trinh thám dựa trên những vụ án có thật, theo chân bác sĩ pháp y tìm ra sự thật đằng sau những tử thi."
+        },
+        "kheo-an-noi-se-co-duoc-thien-ha": {
+            id: "kheo-an-noi-se-co-duoc-thien-ha", title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ", price: 118000, img: "../assets/images/q45.png", category: "Tâm lý",
+            author: "Trác Nhã", publisher: "NXB Văn Học", year: 2020, weight: 360, size: "20.5 x 14.5", pages: 400,
+            description: "Nắm vững kỹ năng giao tiếp, biết cách nói chuyện sao cho đi vào lòng người để đạt được thành công trong xã hội."
+        },
+        // ---- PHẦN BỔ SUNG NHỮNG CUỐN CÒN THIẾU ----
+        "nha-gia-kim": {
+            id: "nha-gia-kim", title: "Nhà giả kim", price: 100000, img: "../assets/images/nha-gia-kim.jpg", category: "Văn học",
+            author: "Paulo Coelho", publisher: "NXB Hà Nội", year: 2020, weight: 250, size: "20.5 x 13", pages: 228,
+            description: "Tất cả những trải nghiệm trong chuyến phiêu du theo đuổi vận mệnh của mình đã giúp Santiago thấu hiểu được ý nghĩa sâu xa nhất của hạnh phúc."
+        },
+        "90-tre-thong-minh-nho-tro-chuyen": {
+            id: "90-tre-thong-minh-nho-tro-chuyen", title: "90% Trẻ Thông Minh Nhờ Trò Chuyện", price: 33000, img: "../assets/images/q16.png", category: "Kỹ năng",
+            author: "Fukuda Takeshi", publisher: "NXB Phụ Nữ", year: 2019, weight: 200, size: "20 x 13", pages: 180,
+            description: "Phương pháp giáo dục sớm của Nhật Bản, chỉ ra rằng ngôn ngữ và những cuộc trò chuyện hàng ngày quyết định trí thông minh của trẻ."
+        },
+        "bi-mat-cua-phan-thien-an": {
+            id: "bi-mat-cua-phan-thien-an", title: "Bí Mật Của Phan Thiên Ân", price: 69000, img: "../assets/images/q19.png", category: "Kỹ năng",
+            author: "Tiến sĩ Alan Phan", publisher: "NXB Tổng Hợp", year: 2018, weight: 250, size: "20.5 x 13", pages: 210,
+            description: "Mười tờ kinh vô giá thay đổi cuộc đời, mang đến cho bạn chìa khóa của sự thành công, giàu có và bình an."
+        },
+        "co-hai-con-meo-ngoi-ben-cua-so": {
+            id: "co-hai-con-meo-ngoi-ben-cua-so", title: "Có Hai Con Mèo Ngồi Bên Cửa Sổ", price: 77000, img: "../assets/images/q22.png", category: "Văn học",
+            author: "Nguyễn Nhật Ánh", publisher: "NXB Trẻ", year: 2018, weight: 220, size: "20 x 13", pages: 212,
+            description: "Tình bạn kỳ lạ giữa mèo Gấu và chuột Tí Hon, một câu chuyện trong trẻo, hài hước mà đẫm tình nhân ái."
+        },
+        "hanh-tinh-cua-mot-ke-nghi-nhieu": {
+            id: "hanh-tinh-cua-mot-ke-nghi-nhieu", title: "Hành Tinh Của Một Kẻ Nghĩ Nhiều", price: 56000, img: "../assets/images/q23.png", category: "Tâm lý",
+            author: "Nguyễn Đoàn Minh Đức", publisher: "NXB Kim Đồng", year: 2021, weight: 280, size: "20 x 13", pages: 240,
+            description: "Lăng kính tâm lý học dành cho những 'overthinker', giúp bạn thấu hiểu và làm hòa với mớ bòng bong trong đầu mình."
+        },
+        "tu-dien-tieng-em": {
+            id: "tu-dien-tieng-em", title: "Từ Điển Tiếng 'Em'", price: 55000, img: "../assets/images/q24.png", category: "Văn học",
+            author: "Khotudien", publisher: "NXB Văn Học", year: 2020, weight: 200, size: "18 x 13", pages: 180,
+            description: "Cuốn từ điển dí dỏm, bóc trần những định nghĩa 'thật trân' về ngôn ngữ tình yêu của phái đẹp trong mắt cánh mày râu."
+        },
+        "di-tim-le-song": {
+            id: "di-tim-le-song", title: "Đi Tìm Lẽ Sống", price: 62000, img: "../assets/images/q25.png", category: "Tâm lý",
+            author: "Viktor E. Frankl", publisher: "NXB Tổng Hợp", year: 2020, weight: 220, size: "20.5 x 13", pages: 216,
+            description: "Kinh nghiệm sinh tồn trong trại tập trung của Đức Quốc xã và liệu pháp ý nghĩa giúp con người vượt qua mọi bi kịch."
+        },
+        "cho-toi-xin-mot-ve-di-tuoi-tho": {
+            id: "cho-toi-xin-mot-ve-di-tuoi-tho", title: "Cho Tôi Xin Một Vé Đi Tuổi Thơ", price: 69300, img: "../assets/images/q27.png", category: "Văn học",
+            author: "Nguyễn Nhật Ánh", publisher: "NXB Trẻ", year: 2018, weight: 250, size: "20 x 13", pages: 224,
+            description: "Chiếc vé tàu đưa bạn trở về những ngày tháng tuổi thơ dữ dội, ngỗ nghịch nhưng vô cùng trong sáng và đáng nhớ."
+        },
+        "bien-moi-thu-thanh-tien": {
+            id: "bien-moi-thu-thanh-tien", title: "Biến Mọi Thứ Thành Tiền", price: 109000, img: "../assets/images/q30.png", category: "Kinh tế",
+            author: "Tetsuya Ishida", publisher: "NXB Công Thương", year: 2021, weight: 300, size: "20.5 x 13.5", pages: 280,
+            description: "Tư duy khởi nghiệp tinh gọn, hướng dẫn cách thương mại hóa mọi ý tưởng và kỹ năng bạn đang có."
+        },
+        "combo-sach-english": {
+            id: "combo-sach-english", title: "Combo sách English", price: 85500, img: "../assets/images/q33.png", category: "Ngoại ngữ",
+            author: "Nhiều Tác Giả", publisher: "NXB Đại Học Quốc Gia", year: 2022, weight: 600, size: "24 x 16", pages: 450,
+            description: "Bộ tài liệu tổng hợp ngữ pháp và từ vựng, hỗ trợ đắc lực cho các bạn sinh viên chuẩn bị thi chứng chỉ TOEIC, IELTS."
+        },
+        "lam-giau-tu-chung-khoan-bo-2-cuon": {
+            id: "lam-giau-tu-chung-khoan-bo-2-cuon", title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, img: "../assets/images/q34.png", category: "Kinh tế",
+            author: "William J. O'Neil", publisher: "NXB Kinh Tế", year: 2022, weight: 900, size: "24 x 16", pages: 800,
+            description: "Hệ thống đầu tư CANSLIM huyền thoại giúp bạn kiếm tiền trên thị trường chứng khoán một cách có kỷ luật."
+        },
+        "khong-so-cham-chi-so-dung": {
+            id: "khong-so-cham-chi-so-dung", title: "Không Sợ Chậm Chỉ Sợ Dừng", price: 84000, img: "../assets/images/q35.png", category: "Kỹ năng",
+            author: "Vương Giác", publisher: "NXB Thanh Niên", year: 2021, weight: 320, size: "20.5 x 14", pages: 300,
+            description: "Thông điệp về sự kiên trì, nỗ lực từng bước nhỏ. Chậm lại để vững vàng hơn trong một thế giới vội vã."
+        },
+        "vi-than-cua-nhung-quyet-dinh": {
+            id: "vi-than-cua-nhung-quyet-dinh", title: "Vị Thần Của Những Quyết Định", price: 51000, img: "../assets/images/q37.png", category: "Kỹ năng",
+            author: "Nhiều Tác Giả", publisher: "NXB Thế Giới", year: 2019, weight: 200, size: "20 x 13", pages: 190,
+            description: "Nghệ thuật ra quyết định sáng suốt trong những thời khắc quan trọng, loại bỏ sự chần chừ và hối tiếc."
+        },
+        "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban": {
+            id: "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban", title: "Thỏ Bảy Màu Và Những Người Nghĩ Nó Là Bạn", price: 79000, img: "../assets/images/q38.png", category: "Văn học",
+            author: "Huỳnh Thái Ngọc", publisher: "NXB Phụ Nữ", year: 2021, weight: 250, size: "20 x 20", pages: 150,
+            description: "Tuyển tập truyện tranh hài hước, siêu bựa và lầy lội về nhân vật Thỏ Bảy Màu đình đám trên mạng xã hội."
+        },
+        "muon-kiep-nhan-sinh-tap-3": {
+            id: "muon-kiep-nhan-sinh-tap-3", title: "Muôn Kiếp Nhân Sinh - Tập 3", price: 152600, img: "../assets/images/q39.png", category: "Văn học",
+            author: "Nguyên Phong", publisher: "NXB Tổng Hợp TPHCM", year: 2023, weight: 400, size: "21 x 14.5", pages: 350,
+            description: "Tập mới nhất nối tiếp hành trình tỉnh thức, bàn sâu về nhân quả và sự chuyển hóa tâm thức trong thời kỳ hỗn loạn."
+        },
+        "to-binh-yen-ve-hanh-phuc": {
+            id: "to-binh-yen-ve-hanh-phuc", title: "Tô Bình Yên Vẽ Hạnh Phúc", price: 70000, img: "../assets/images/q40.png", category: "Kỹ năng",
+            author: "Kulzsc", publisher: "NXB Thế Giới", year: 2021, weight: 220, size: "20.5 x 14", pages: 180,
+            description: "Sách tương tác kết hợp tản văn và tô màu, giúp xoa dịu tâm hồn và tìm thấy niềm vui từ những điều nhỏ bé."
+        },
+        "thuat-thao-tung": {
+            id: "thuat-thao-tung", title: "Thuật Thao Túng", price: 89600, img: "../assets/images/q42.png", category: "Kỹ năng",
+            author: "Henrik Fexeus", publisher: "NXB Lao Động", year: 2022, weight: 330, size: "20.5 x 13.5", pages: 310,
+            description: "Bí mật tâm lý học hành vi giúp bạn không bị điều khiển, đồng thời biết cách kiểm soát tình thế trong giao tiếp."
+        },
+        "khong-phai-soi-nhung-cung-dung-la-cuu": {
+            id: "khong-phai-soi-nhung-cung-dung-la-cuu", title: "Không Phải Sói Nhưng Cũng Đừng Là Cừu", price: 92000, img: "../assets/images/q44.png", category: "Văn học",
+            author: "Lê Bảo Tôn", publisher: "NXB Hà Nội", year: 2021, weight: 340, size: "20.5 x 14", pages: 320,
+            description: "Sống tử tế nhưng phải có gai, bài học về sự mạnh mẽ để bảo vệ bản thân giữa những cạm bẫy cuộc đời."
+        },
+        "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong": {
+            id: "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong", title: "Nói Chuyện Là Bản Năng, Giữ Miệng Là Tu Dưỡng", price: 123000, img: "../assets/images/q48.png", category: "Kỹ năng",
+            author: "Trương Tiếu Hằng", publisher: "NXB Thanh Niên", year: 2022, weight: 360, size: "21 x 14.5", pages: 350,
+            description: "Trí tuệ EQ đỉnh cao: Biết lúc nào nên nói, lúc nào nên im lặng. Cuốn sách giúp bạn tránh xa những rắc rối vạ miệng."
+        }
+    };
+
+const danhSachTimKiem = Object.values(bookDatabase);
+    // 2. LẤY MÃ SÁCH TỪ THANH ĐỊA CHỈ
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('id'); // Ví dụ link là: chi-tiet-sach.html?id=dac-nhan-tam
+
+    // 3. ĐỔ DỮ LIỆU RA MÀN HÌNH
+    if (bookId && bookDatabase[bookId]) {
+        const book = bookDatabase[bookId];
+
+        // Format tiền VNĐ
+        const formattedPrice = book.price.toLocaleString('vi-VN') + ' đ';
+
+        // Gắn vào phần hiển thị chính
+        document.getElementById('bc-title').innerText = book.title;
+        document.getElementById('detail-img').src = book.img;
+        document.getElementById('detail-title').innerText = book.title;
+        document.getElementById('detail-author').innerText = book.author;
+        document.getElementById('detail-publisher').innerText = book.publisher;
+        document.getElementById('detail-price').innerText = formattedPrice;
+
+        // Gắn vào Bảng thông số kỹ thuật
+        document.getElementById('spec-id').innerText = book.id.toUpperCase();
+        document.getElementById('spec-category').innerText = book.category;
+        document.getElementById('spec-author-table').innerText = book.author;
+        document.getElementById('spec-publisher').innerText = book.publisher;
+        document.getElementById('spec-year').innerText = book.year;
+        document.getElementById('spec-weight').innerText = book.weight;
+        document.getElementById('spec-size').innerText = book.size;
+        document.getElementById('spec-pages').innerText = book.pages;
+
+        // Gắn vào Mô tả
+        document.getElementById('desc-title').innerText = book.title;
+        document.getElementById('desc-content').innerText = book.description;
+    } else {
+        document.getElementById('detail-title').innerText = "Vui lòng chọn một sản phẩm từ danh mục!";
+        document.querySelector('.product-detail-wrapper').style.display = 'none';
+        document.querySelector('.product-specs-wrapper').style.display = 'none';
+    }
+
+    // Logic Tăng giảm số lượng
+    function changeQty(amount) {
+        let input = document.getElementById('qty-input');
+        let currentVal = parseInt(input.value);
+        if (currentVal + amount >= 1) {
+            input.value = currentVal + amount;
+        }
+    }
+
+    // Load tên đăng nhập (giữ nguyên logic của bạn)
+    document.addEventListener('DOMContentLoaded', function() {
+        var tenUser = sessionStorage.getItem('tenKhachHang');
+        if (tenUser) {
+            document.getElementById('menu-login').innerHTML = `
+                <a href="#" style="color: #f39c12; font-weight: bold;">👋 Chào, ${tenUser}</a>
+                <a href="#" onclick="sessionStorage.removeItem('tenKhachHang'); window.location.reload();" style="font-size: 12px; color: #e74c3c; margin-left: 5px;">(Thoát)</a>
+            `;
+        }
+    });
+</script>
+
+<!-- ==============================================
+     JAVASCRIPT: THANH TÌM KIẾM THÔNG MINH (TÊN, TÁC GIẢ, THỂ LOẠI)
+     ============================================== -->
+<script>
+
+    // 2. HÀM CHUẨN HÓA TIẾNG VIỆT (Bỏ dấu, viết thường)
+    function xoaDau(str) {
+        if (!str) return ""; // Tránh lỗi nếu dữ liệu bị rỗng
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+    }
+
+    // 3. BẮT ĐẦU XỬ LÝ LỌC SÁCH
+    const oTimKiem = document.getElementById('search-input');
+    const hopGoiY = document.getElementById('search-suggestions');
+
+    if (oTimKiem && hopGoiY) {
+        oTimKiem.addEventListener('input', function() {
+            const tuKhoa = xoaDau(this.value.trim()); // Chữ khách hàng vừa gõ
+            hopGoiY.innerHTML = ''; // Xóa sạch kết quả cũ
+
+            if (tuKhoa.length > 0) {
+                // ĐIỀU KIỆN 3 TRONG 1: TÊN SÁCH || TÁC GIẢ || THỂ LOẠI
+                const ketQua = danhSachTimKiem.filter(sach => {
+                    const tenSachKhongDau = xoaDau(sach.title);
+                    const tenTacGiaKhongDau = xoaDau(sach.author);
+                    const theLoaiKhongDau = xoaDau(sach.category);
+
+                    return tenSachKhongDau.includes(tuKhoa) ||
+                           tenTacGiaKhongDau.includes(tuKhoa) ||
+                           theLoaiKhongDau.includes(tuKhoa);
+                });
+
+                if (ketQua.length > 0) {
+                    hopGoiY.style.display = 'block'; // Hiện hộp gợi ý
+
+                    // In từng cuốn sách ra HTML
+                    ketQua.forEach(sach => {
+                        const theA = document.createElement('a');
+                        theA.href = `chi-tiet-sach.html?id=${sach.id}`;
+                        theA.className = 'suggestion-item';
+
+                        const giaTien = sach.price.toLocaleString('vi-VN') + ' đ';
+
+                        theA.innerHTML = `
+                            <img src="${sach.img}" alt="${sach.title}">
+                            <div class="suggestion-item-info">
+                                <h4>${sach.title}</h4>
+                                <p>${giaTien}</p>
+                            </div>
+                        `;
+                        hopGoiY.appendChild(theA);
+                    });
+                } else {
+                    hopGoiY.style.display = 'none'; // Không có kết quả thì ẩn đi
+                }
+            } else {
+                hopGoiY.style.display = 'none'; // Xóa hết chữ trên ô tìm kiếm cũng ẩn đi
+            }
+        });
+
+// BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM PHÍM ENTER
+        oTimKiem.addEventListener('keypress', function(event) {
+            // Kiểm tra xem phím vừa bấm có phải là Enter không
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                const tuKhoa = this.value.trim(); // Lấy chữ khách vừa gõ
+
+                if (tuKhoa.length > 0) {
+                    // Nhảy sang trang Danh mục sách và "xách" theo từ khóa trên URL
+                    // Ví dụ: danh-muc-sach.html?search=nha%20gia%20kim
+                    window.location.href = `danh-muc-sach.html?search=${encodeURIComponent(tuKhoa)}`;
+                }
+            }
+        });
+
+        // 4. BẤM CHUỘT RA NGOÀI THÌ TỰ ĐỘNG ẨN HỘP GỢI Ý
+        document.addEventListener('click', function(event) {
+            if (!oTimKiem.contains(event.target) && !hopGoiY.contains(event.target)) {
+                hopGoiY.style.display = 'none';
+            }
+        });
+    }
+// ==========================================
+// CHỨC NĂNG 1: THÊM VÀO GIỎ HÀNG
+// ==========================================
+function addToCart() {
+    if (!bookId || !bookDatabase[bookId]) return;
+    const book = bookDatabase[bookId];
+    const qty = parseInt(document.getElementById('qty-input').value);
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingItem = cart.find(item => item.id === book.id);
+
+    if (existingItem) {
+        existingItem.quantity += qty;
+    } else {
+        cart.push({
+            id: book.id,
+            title: book.title,
+            price: book.price,
+            image: book.img,
+            quantity: qty
+        });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`Đã thêm ${qty} cuốn "${book.title}" vào giỏ hàng!`);
+}
+
+// ==========================================
+// CHỨC NĂNG 2: MUA NGAY
+// ==========================================
+let finalPrice = 0;
+
+function openBuyModal() {
+    if (!bookId || !bookDatabase[bookId]) return;
+    const book = bookDatabase[bookId];
+    const qty = parseInt(document.getElementById('qty-input').value);
+    finalPrice = qty * book.price;
+
+    document.getElementById('modal-total').innerText = `Tổng cộng: ${finalPrice.toLocaleString('vi-VN')} đ`;
+    document.getElementById('buyNowModal').style.display = 'flex';
+}
+
+function confirmPurchase() {
+    const name = document.getElementById('buyer-name').value.trim();
+    const phone = document.getElementById('buyer-phone').value.trim();
+    const address = document.getElementById('buyer-address').value.trim();
+    const method = document.querySelector('input[name="pay-method"]:checked').value;
+
+    if (!name || !phone || !address) {
+        alert("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+
+    // Tạo đơn hàng giả lập lưu vào LocalStorage (giống luồng thanh toán bên giỏ hàng)
+    const newOrder = {
+        orderId: 'ORD' + Date.now(),
+        customer: name,
+        phone: phone,
+        address: address,
+        total: finalPrice,
+        method: method,
+        status: 'Chờ xác nhận'
+    };
+
+    let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+    orders.push(newOrder);
+    localStorage.setItem('adc_orders', JSON.stringify(orders));
+
+    alert("Đặt hàng thành công!");
+    window.location.href = "gio-hang.html"; // Chuyển về giỏ hàng để xem đơn
+}
+</script>
+<!-- Modal Mua Ngay (Popup hiện lên để nhập thông tin) -->
+<div id="buyNowModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 25px; border-radius: 8px; width: 400px; position: relative; font-family: sans-serif;">
+        <span onclick="document.getElementById('buyNowModal').style.display='none'" style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px;">&times;</span>
+        <h2 style="margin-top: 0; text-align: center; color: #2c3e50;">Thanh Toán Nhanh</h2>
+        <p id="modal-total" style="text-align: center; font-weight: bold; color: #e74c3c;"></p>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Họ tên (*):</label>
+            <input type="text" id="buyer-name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Số điện thoại (*):</label>
+            <input type="text" id="buyer-phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Địa chỉ (*):</label>
+            <textarea id="buyer-address" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" rows="2"></textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Phương thức:</label><br>
+            <input type="radio" name="pay-method" value="cod" checked onchange="document.getElementById('qr-img').style.display='none'"> Tiền mặt 
+            <input type="radio" name="pay-method" value="qr" onchange="document.getElementById('qr-img').style.display='block'"> Quét QR
+        </div>
+
+        <div id="qr-img" style="display: none; text-align: center; margin-bottom: 15px;">
+            <img src="https://api.vietqr.io/image/970436-0987654321-123456?amount=0&addInfo=ThanhToanBookstore" style="width: 150px; border: 1px dashed #3498db;">
+        </div>
+
+        <button onclick="confirmPurchase()" style="width: 100%; padding: 12px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">XÁC NHẬN ĐẶT HÀNG</button>
+    </div>
+</div>
 
 </body>
 </html>
