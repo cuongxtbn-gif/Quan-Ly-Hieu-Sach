@@ -18,7 +18,7 @@
 
     <div class="search-bar" style="position: relative;">
         <input type="text" id="search-input" placeholder="Tìm kiếm sách bạn yêu thích..." autocomplete="off">
-
+        <!-- Hộp chứa gợi ý (mặc định ẩn) -->
         <div id="search-suggestions" class="suggestions-box"></div>
     </div>
 
@@ -196,6 +196,154 @@
     function dangXuat() {
         sessionStorage.removeItem('tenKhachHang'); // Xóa tên khỏi bộ nhớ
         window.location.reload(); // Tải lại trang web về trạng thái ban đầu
+    }
+</script>
+
+<!-- ==============================================
+     JAVASCRIPT: THANH TÌM KIẾM THÔNG MINH (TÊN, TÁC GIẢ, THỂ LOẠI)
+     ============================================== -->
+<script>
+    // 1. KHO DỮ LIỆU ĐẦY ĐỦ 56 CUỐN SÁCH CỦA BOOKSTORE
+    const bookDatabase = {
+        "ba-tuoc-monte-cristo": { id: "ba-tuoc-monte-cristo", title: "Bá tước Monte Cristo", price: 185000, img: "../assets/images/ba-tuoc-monte-cristo.jpg", author: "Alexandre Dumas", category: "Văn học" },
+        "giet-con-chim-nhai": { id: "giet-con-chim-nhai", title: "Giết con chim nhại", price: 210000, img: "../assets/images/giet-con-chim-nhai.jpg", author: "Harper Lee", category: "Văn học" },
+        "hai-so-phan": { id: "hai-so-phan", title: "Hai số phận", price: 320000, img: "../assets/images/hai-so-phan.jpg", author: "Jeffrey Archer", category: "Văn học" },
+        "khong-gia-dinh": { id: "khong-gia-dinh", title: "Không gia đình", price: 450000, img: "../assets/images/khong-gia-dinh.jpg", author: "Hector Malot", category: "Văn học" },
+        "phia-sau-nghi-can-x": { id: "phia-sau-nghi-can-x", title: "Phía sau nghi can X", price: 230000, img: "../assets/images/phia-sau-nghi-can-x.png", author: "Keigo Higashino", category: "Trinh thám" },
+        "rung-nauy": { id: "rung-nauy", title: "Rừng Nauy", price: 240000, img: "../assets/images/rung-nauy.png", author: "Haruki Murakami", category: "Văn học" },
+        "bo-gia": { id: "bo-gia", title: "Bố Già", price: 105000, img: "../assets/images/bo-gia.png", author: "Mario Puzo", category: "Văn học" },
+        "nhung-nguoi-khon-kho": { id: "nhung-nguoi-khon-kho", title: "Những người khốn khổ", price: 285000, img: "../assets/images/nhung-nguoi-khon-kho.png", author: "Victor Hugo", category: "Văn học" },
+        "phia-tay-khong-co-gi-la": { id: "phia-tay-khong-co-gi-la", title: "Phía tây không có gì lạ", price: 50000, img: "../assets/images/phia-tay-khong-co-gi-la.png", author: "Erich Maria Remarque", category: "Văn học" },
+        "tuoi-tre-dang-gia-bao-nhieu": { id: "tuoi-tre-dang-gia-bao-nhieu", title: "Tuổi trẻ đáng giá bao nhiêu", price: 80000, img: "../assets/images/tuoi-tre-dang-gia-bao-nhieu.png", author: "Rosie Nguyễn", category: "Kỹ năng" },
+        "cay-cam-ngot-cua-toi": { id: "cay-cam-ngot-cua-toi", title: "Cây Cam Ngọt Của Tôi", price: 81000, img: "../assets/images/cay-cam-ngot-cua-toi.png", author: "José Mauro de Vasconcelos", category: "Văn học" },
+        "khong-diet-khong-sinh-dung-so-hai": { id: "khong-diet-khong-sinh-dung-so-hai", title: "Không Diệt Không Sinh Đừng Sợ Hãi", price: 82500, img: "../assets/images/q2.png", author: "Thích Nhất Hạnh", category: "Kỹ năng" },
+        "khi-hoi-tho-hoa-thinh-khong": { id: "khi-hoi-tho-hoa-thinh-khong", title: "Khi Hơi Thở Hóa Thinh Không", price: 81750, img: "../assets/images/q3.png", author: "Paul Kalanithi", category: "Văn học" },
+        "dan-ong-sao-hoa-dan-ba-sao-kim": { id: "dan-ong-sao-hoa-dan-ba-sao-kim", title: "Đàn Ông Sao Hỏa Đàn Bà Sao Kim", price: 122000, img: "../assets/images/q4.png", author: "John Gray", category: "Kỹ năng" },
+        "muon-kiep-nhan-sinh": { id: "muon-kiep-nhan-sinh", title: "Muôn Kiếp Nhân Sinh", price: 117600, img: "../assets/images/q5.png", author: "Nguyên Phong", category: "Văn học" },
+        "tieng-han-tong-hop-so-cap-1": { id: "tieng-han-tong-hop-so-cap-1", title: "Tiếng Hàn Tổng Hợp - Sơ Cấp 1", price: 148500, img: "../assets/images/q6.png", author: "Nhiều Tác Giả", category: "Ngoại ngữ" },
+        "dac-nhan-tam": { id: "dac-nhan-tam", title: "Đắc Nhân Tâm", price: 56000, img: "../assets/images/dac-nhan-tam.jpg", author: "Dale Carnegie", category: "Kỹ năng" },
+        "day-con-lam-giau-01": { id: "day-con-lam-giau-01", title: "Dạy Con Làm Giàu 01", price: 62000, img: "../assets/images/q8.png", author: "Robert T. Kiyosaki", category: "Kinh tế" },
+        "hieu-ve-trai-tim": { id: "hieu-ve-trai-tim", title: "Hiểu Về Trái Tim", price: 119000, img: "../assets/images/q9.png", author: "Thích Minh Niệm", category: "Kỹ năng" },
+        "ngon-ngu-co-the": { id: "ngon-ngu-co-the", title: "Ngôn Ngữ Cơ Thể", price: 158000, img: "../assets/images/q10.png", author: "Allan Pease", category: "Kỹ năng" },
+        "cam-on-nguoi-lon": { id: "cam-on-nguoi-lon", title: "Cảm Ơn Người Lớn", price: 84700, img: "../assets/images/q11.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "thay-doi-cuoc-song-voi-nhan-so-hoc": { id: "thay-doi-cuoc-song-voi-nhan-so-hoc", title: "Thay Đổi Cuộc Sống Với Nhân Số Học", price: 173600, img: "../assets/images/q12.png", author: "Lê Đỗ Quỳnh Hương", category: "Kỹ năng" },
+        "khoi-nghiep-ban-le": { id: "khoi-nghiep-ban-le", title: "Khởi Nghiệp Bán Lẻ", price: 125000, img: "../assets/images/q13.png", author: "Trần Thanh Phong", category: "Kinh tế" },
+        "muon-kiep-nhan-sinh-tap-2": { id: "muon-kiep-nhan-sinh-tap-2", title: "Muôn Kiếp Nhân Sinh - Tập 2", price: 187600, img: "../assets/images/q14.png", author: "Nguyên Phong", category: "Văn học" },
+        "lam-ban-voi-bau-troi": { id: "lam-ban-voi-bau-troi", title: "Làm Bạn Với Bầu Trời", price: 169400, img: "../assets/images/q15.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "tam-ly-hoc-toi-pham": { id: "tam-ly-hoc-toi-pham", title: "Tâm Lý Học Tội Phạm", price: 94000, img: "../assets/images/q17.png", author: "Stanton E. Samenow", category: "Tâm lý" },
+        "thien-tai-ben-trai-ke-dien-ben-phai": { id: "thien-tai-ben-trai-ke-dien-ben-phai", title: "Thiên Tài Bên Trái, Kẻ Điên Bên Phải", price: 116000, img: "../assets/images/q18.png", author: "Cao Minh", category: "Tâm lý" },
+        "tam-ly-hoc-ve-tien": { id: "tam-ly-hoc-ve-tien", title: "Tâm Lý Học Về Tiền", price: 141500, img: "../assets/images/q20.png", author: "Morgan Housel", category: "Tâm lý" },
+        "cay-chuoi-non-di-giay-xanh": { id: "cay-chuoi-non-di-giay-xanh", title: "Cây Chuối Non Đi Giày Xanh", price: 84700, img: "../assets/images/q21.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau": { id: "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau", title: "Tự Học Tiếng Trung Cho Người Mới Bắt Đầu", price: 85500, img: "../assets/images/q26.png", author: "MCBooks", category: "Ngoại ngữ" },
+        "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat": { id: "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat", title: "Ông Trăm Tuổi Trèo Qua Cửa Sổ Và Biến Mất", price: 146300, img: "../assets/images/q28.png", author: "Jonas Jonasson", category: "Văn học" },
+        "nguoi-dua-dieu": { id: "nguoi-dua-dieu", title: "Người Đua Diều", price: 146300, img: "../assets/images/q29.png", author: "Khaled Hosseini", category: "Văn học" },
+        "think-and-grow-rich": { id: "think-and-grow-rich", title: "Think And Grow Rich", price: 77000, img: "../assets/images/q31.png", author: "Napoleon Hill", category: "Kinh tế" },
+        "nguoi-giau-co-nhat-thanh-babylon": { id: "nguoi-giau-co-nhat-thanh-babylon", title: "Người Giàu Có Nhất Thành Babylon", price: 74000, img: "../assets/images/q32.png", author: "George S. Clason", category: "Kinh tế" },
+        "lam-giau-tu-chung-khoan": { id: "lam-giau-tu-chung-khoan", title: "Làm Giàu Từ Chứng Khoán", price: 700000, img: "../assets/images/q34.png", author: "William J. O'Neil", category: "Kinh tế" },
+        "ghi-chep-phap-y-nhung-cai-chet-bi-an": { id: "ghi-chep-phap-y-nhung-cai-chet-bi-an", title: "Ghi Chép Pháp Y - Những Cái Chết Bí Ẩn", price: 112500, img: "../assets/images/q41.png", author: "Pháp y Tần Minh", category: "Trinh thám" },
+        "kheo-an-noi-se-co-duoc-thien-ha": { id: "kheo-an-noi-se-co-duoc-thien-ha", title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ", price: 118000, img: "../assets/images/q45.png", author: "Trác Nhã", category: "Tâm lý" },
+        "nha-gia-kim": { id: "nha-gia-kim", title: "Nhà giả kim", price: 100000, img: "../assets/images/nha-gia-kim.jpg", author: "Paulo Coelho", category: "Văn học" },
+        "90-tre-thong-minh-nho-tro-chuyen": { id: "90-tre-thong-minh-nho-tro-chuyen", title: "90% Trẻ Thông Minh Nhờ Trò Chuyện", price: 33000, img: "../assets/images/q16.png", author: "Fukuda Takeshi", category: "Kỹ năng" },
+        "bi-mat-cua-phan-thien-an": { id: "bi-mat-cua-phan-thien-an", title: "Bí Mật Của Phan Thiên Ân", price: 69000, img: "../assets/images/q19.png", author: "Tiến sĩ Alan Phan", category: "Kỹ năng" },
+        "co-hai-con-meo-ngoi-ben-cua-so": { id: "co-hai-con-meo-ngoi-ben-cua-so", title: "Có Hai Con Mèo Ngồi Bên Cửa Sổ", price: 77000, img: "../assets/images/q22.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "hanh-tinh-cua-mot-ke-nghi-nhieu": { id: "hanh-tinh-cua-mot-ke-nghi-nhieu", title: "Hành Tinh Của Một Kẻ Nghĩ Nhiều", price: 56000, img: "../assets/images/q23.png", author: "Nguyễn Đoàn Minh Đức", category: "Tâm lý" },
+        "tu-dien-tieng-em": { id: "tu-dien-tieng-em", title: "Từ Điển Tiếng 'Em'", price: 55000, img: "../assets/images/q24.png", author: "Khotudien", category: "Văn học" },
+        "di-tim-le-song": { id: "di-tim-le-song", title: "Đi Tìm Lẽ Sống", price: 62000, img: "../assets/images/q25.png", author: "Viktor E. Frankl", category: "Tâm lý" },
+        "cho-toi-xin-mot-ve-di-tuoi-tho": { id: "cho-toi-xin-mot-ve-di-tuoi-tho", title: "Cho Tôi Xin Một Vé Đi Tuổi Thơ", price: 69300, img: "../assets/images/q27.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "bien-moi-thu-thanh-tien": { id: "bien-moi-thu-thanh-tien", title: "Biến Mọi Thứ Thành Tiền", price: 109000, img: "../assets/images/q30.png", author: "Tetsuya Ishida", category: "Kinh tế" },
+        "combo-sach-english": { id: "combo-sach-english", title: "Combo sách English", price: 85500, img: "../assets/images/q33.png", author: "Nhiều Tác Giả", category: "Ngoại ngữ" },
+        "lam-giau-tu-chung-khoan-bo-2-cuon": { id: "lam-giau-tu-chung-khoan-bo-2-cuon", title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, img: "../assets/images/q34.png", author: "William J. O'Neil", category: "Kinh tế" },
+        "khong-so-cham-chi-so-dung": { id: "khong-so-cham-chi-so-dung", title: "Không Sợ Chậm Chỉ Sợ Dừng", price: 84000, img: "../assets/images/q35.png", author: "Vương Giác", category: "Kỹ năng" },
+        "vi-than-cua-nhung-quyet-dinh": { id: "vi-than-cua-nhung-quyet-dinh", title: "Vị Thần Của Những Quyết Định", price: 51000, img: "../assets/images/q37.png", author: "Nhiều Tác Giả", category: "Kỹ năng" },
+        "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban": { id: "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban", title: "Thỏ Bảy Màu Và Những Người Nghĩ Nó Là Bạn", price: 79000, img: "../assets/images/q38.png", author: "Huỳnh Thái Ngọc", category: "Văn học" },
+        "muon-kiep-nhan-sinh-tap-3": { id: "muon-kiep-nhan-sinh-tap-3", title: "Muôn Kiếp Nhân Sinh - Tập 3", price: 152600, img: "../assets/images/q39.png", author: "Nguyên Phong", category: "Văn học" },
+        "to-binh-yen-ve-hanh-phuc": { id: "to-binh-yen-ve-hanh-phuc", title: "Tô Bình Yên Vẽ Hạnh Phúc", price: 70000, img: "../assets/images/q40.png", author: "Kulzsc", category: "Kỹ năng" },
+        "thuat-thao-tung": { id: "thuat-thao-tung", title: "Thuật Thao Túng", price: 89600, img: "../assets/images/q42.png", author: "Henrik Fexeus", category: "Kỹ năng" },
+        "khong-phai-soi-nhung-cung-dung-la-cuu": { id: "khong-phai-soi-nhung-cung-dung-la-cuu", title: "Không Phải Sói Nhưng Cũng Đừng Là Cừu", price: 92000, img: "../assets/images/q44.png", author: "Lê Bảo Tôn", category: "Văn học" },
+        "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong": { id: "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong", title: "Nói Chuyện Là Bản Năng, Giữ Miệng Là Tu Dưỡng", price: 123000, img: "../assets/images/q48.png", author: "Trương Tiếu Hằng", category: "Kỹ năng" }
+    };
+
+    // Chuyển Object thành dạng Mảng (Array) để dễ dàng lọc
+    const danhSachTimKiem = Object.values(bookDatabase);
+
+    // 2. HÀM CHUẨN HÓA TIẾNG VIỆT (Bỏ dấu, viết thường)
+    function xoaDau(str) {
+        if (!str) return ""; // Tránh lỗi nếu dữ liệu bị rỗng
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+    }
+
+    // 3. BẮT ĐẦU XỬ LÝ LỌC SÁCH
+    const oTimKiem = document.getElementById('search-input');
+    const hopGoiY = document.getElementById('search-suggestions');
+
+    if (oTimKiem && hopGoiY) {
+        oTimKiem.addEventListener('input', function() {
+            const tuKhoa = xoaDau(this.value.trim()); // Chữ khách hàng vừa gõ
+            hopGoiY.innerHTML = ''; // Xóa sạch kết quả cũ
+
+            if (tuKhoa.length > 0) {
+                // ĐIỀU KIỆN 3 TRONG 1: TÊN SÁCH || TÁC GIẢ || THỂ LOẠI
+                const ketQua = danhSachTimKiem.filter(sach => {
+                    const tenSachKhongDau = xoaDau(sach.title);
+                    const tenTacGiaKhongDau = xoaDau(sach.author);
+                    const theLoaiKhongDau = xoaDau(sach.category);
+
+                    return tenSachKhongDau.includes(tuKhoa) ||
+                           tenTacGiaKhongDau.includes(tuKhoa) ||
+                           theLoaiKhongDau.includes(tuKhoa);
+                });
+
+                if (ketQua.length > 0) {
+                    hopGoiY.style.display = 'block'; // Hiện hộp gợi ý
+
+                    // In từng cuốn sách ra HTML
+                    ketQua.forEach(sach => {
+                        const theA = document.createElement('a');
+                        theA.href = `chi-tiet-sach.html?id=${sach.id}`;
+                        theA.className = 'suggestion-item';
+
+                        const giaTien = sach.price.toLocaleString('vi-VN') + ' đ';
+
+                        theA.innerHTML = `
+                            <img src="${sach.img}" alt="${sach.title}">
+                            <div class="suggestion-item-info">
+                                <h4>${sach.title}</h4>
+                                <p>${giaTien}</p>
+                            </div>
+                        `;
+                        hopGoiY.appendChild(theA);
+                    });
+                } else {
+                    hopGoiY.style.display = 'none'; // Không có kết quả thì ẩn đi
+                }
+            } else {
+                hopGoiY.style.display = 'none'; // Xóa hết chữ trên ô tìm kiếm cũng ẩn đi
+            }
+        });
+
+// BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM PHÍM ENTER
+        oTimKiem.addEventListener('keypress', function(event) {
+            // Kiểm tra xem phím vừa bấm có phải là Enter không
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                const tuKhoa = this.value.trim(); // Lấy chữ khách vừa gõ
+
+                if (tuKhoa.length > 0) {
+                    // Nhảy sang trang Danh mục sách và "xách" theo từ khóa trên URL
+                    // Ví dụ: danh-muc-sach.html?search=nha%20gia%20kim
+                    window.location.href = `danh-muc-sach.html?search=${encodeURIComponent(tuKhoa)}`;
+                }
+            }
+        });
+
+        // 4. BẤM CHUỘT RA NGOÀI THÌ TỰ ĐỘNG ẨN HỘP GỢI Ý
+        document.addEventListener('click', function(event) {
+            if (!oTimKiem.contains(event.target) && !hopGoiY.contains(event.target)) {
+                hopGoiY.style.display = 'none';
+            }
+        });
     }
 </script>
 

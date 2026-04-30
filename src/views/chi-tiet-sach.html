@@ -11,9 +11,13 @@
 
 <header>
     <div class="logo">🐵 BOOKSTORE</div>
-    <div class="search-bar">
-        <input type="text" placeholder="Tìm kiếm sách bạn yêu thích">
+    <div class="search-bar" style="position: relative;">
+        <!-- Bắt buộc phải có id="search-input" -->
+        <input type="text" id="search-input" placeholder="Tìm kiếm sách bạn yêu thích..." autocomplete="off">
+        <!-- Bắt buộc phải có hộp này để chứa gợi ý -->
+        <div id="search-suggestions" class="suggestions-box"></div>
     </div>
+
     <nav>
         <ul>
             <li><a href="index.html">Trang chủ</a></li>
@@ -376,6 +380,7 @@
         }
     };
 
+const danhSachTimKiem = Object.values(bookDatabase);
     // 2. LẤY MÃ SÁCH TỪ THANH ĐỊA CHỈ
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('id'); // Ví dụ link là: chi-tiet-sach.html?id=dac-nhan-tam
@@ -434,5 +439,92 @@
         }
     });
 </script>
+
+<!-- ==============================================
+     JAVASCRIPT: THANH TÌM KIẾM THÔNG MINH (TÊN, TÁC GIẢ, THỂ LOẠI)
+     ============================================== -->
+<script>
+
+    // 2. HÀM CHUẨN HÓA TIẾNG VIỆT (Bỏ dấu, viết thường)
+    function xoaDau(str) {
+        if (!str) return ""; // Tránh lỗi nếu dữ liệu bị rỗng
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+    }
+
+    // 3. BẮT ĐẦU XỬ LÝ LỌC SÁCH
+    const oTimKiem = document.getElementById('search-input');
+    const hopGoiY = document.getElementById('search-suggestions');
+
+    if (oTimKiem && hopGoiY) {
+        oTimKiem.addEventListener('input', function() {
+            const tuKhoa = xoaDau(this.value.trim()); // Chữ khách hàng vừa gõ
+            hopGoiY.innerHTML = ''; // Xóa sạch kết quả cũ
+
+            if (tuKhoa.length > 0) {
+                // ĐIỀU KIỆN 3 TRONG 1: TÊN SÁCH || TÁC GIẢ || THỂ LOẠI
+                const ketQua = danhSachTimKiem.filter(sach => {
+                    const tenSachKhongDau = xoaDau(sach.title);
+                    const tenTacGiaKhongDau = xoaDau(sach.author);
+                    const theLoaiKhongDau = xoaDau(sach.category);
+
+                    return tenSachKhongDau.includes(tuKhoa) ||
+                           tenTacGiaKhongDau.includes(tuKhoa) ||
+                           theLoaiKhongDau.includes(tuKhoa);
+                });
+
+                if (ketQua.length > 0) {
+                    hopGoiY.style.display = 'block'; // Hiện hộp gợi ý
+
+                    // In từng cuốn sách ra HTML
+                    ketQua.forEach(sach => {
+                        const theA = document.createElement('a');
+                        theA.href = `chi-tiet-sach.html?id=${sach.id}`;
+                        theA.className = 'suggestion-item';
+
+                        const giaTien = sach.price.toLocaleString('vi-VN') + ' đ';
+
+                        theA.innerHTML = `
+                            <img src="${sach.img}" alt="${sach.title}">
+                            <div class="suggestion-item-info">
+                                <h4>${sach.title}</h4>
+                                <p>${giaTien}</p>
+                            </div>
+                        `;
+                        hopGoiY.appendChild(theA);
+                    });
+                } else {
+                    hopGoiY.style.display = 'none'; // Không có kết quả thì ẩn đi
+                }
+            } else {
+                hopGoiY.style.display = 'none'; // Xóa hết chữ trên ô tìm kiếm cũng ẩn đi
+            }
+        });
+
+// BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM PHÍM ENTER
+        oTimKiem.addEventListener('keypress', function(event) {
+            // Kiểm tra xem phím vừa bấm có phải là Enter không
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                const tuKhoa = this.value.trim(); // Lấy chữ khách vừa gõ
+
+                if (tuKhoa.length > 0) {
+                    // Nhảy sang trang Danh mục sách và "xách" theo từ khóa trên URL
+                    // Ví dụ: danh-muc-sach.html?search=nha%20gia%20kim
+                    window.location.href = `danh-muc-sach.html?search=${encodeURIComponent(tuKhoa)}`;
+                }
+            }
+        });
+
+        // 4. BẤM CHUỘT RA NGOÀI THÌ TỰ ĐỘNG ẨN HỘP GỢI Ý
+        document.addEventListener('click', function(event) {
+            if (!oTimKiem.contains(event.target) && !hopGoiY.contains(event.target)) {
+                hopGoiY.style.display = 'none';
+            }
+        });
+    }
+</script>
+
 </body>
 </html>
