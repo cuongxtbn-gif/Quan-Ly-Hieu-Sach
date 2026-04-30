@@ -59,8 +59,8 @@
                 <button class="qty-btn" onclick="changeQty(1)">+</button>
             </div>
             <div class="action-buttons">
-                <button class="btn-add-cart">Thêm vào giỏ hàng</button>
-                <button class="btn-buy-now">Mua ngay</button>
+                <button class="btn-add-cart" onclick="addToCart()">Thêm vào giỏ hàng</button>
+                <button class="btn-buy-now" onclick="openBuyModal()">Mua ngay</button>
             </div>
         </div>
     </div>
@@ -524,7 +524,126 @@ const danhSachTimKiem = Object.values(bookDatabase);
             }
         });
     }
+// ==========================================
+// CHỨC NĂNG 1: THÊM VÀO GIỎ HÀNG
+// ==========================================
+function addToCart() {
+    if (!bookId || !bookDatabase[bookId]) return;
+    const book = bookDatabase[bookId];
+    const qty = parseInt(document.getElementById('qty-input').value);
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingItem = cart.find(item => item.id === book.id);
+
+    if (existingItem) {
+        existingItem.quantity += qty;
+    } else {
+        cart.push({
+            id: book.id,
+            title: book.title,
+            price: book.price,
+            image: book.img,
+            quantity: qty
+        });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`Đã thêm ${qty} cuốn "${book.title}" vào giỏ hàng!`);
+}
+
+// ==========================================
+// CHỨC NĂNG 2: MUA NGAY
+// ==========================================
+let finalPrice = 0;
+
+function openBuyModal() {
+    // Kiểm tra đăng nhập
+    const currentUser = sessionStorage.getItem('tenKhachHang');
+    if (!currentUser) {
+        alert('Bạn cần đăng nhập để tiến hành mua hàng!');
+        window.location.href = 'dang-nhap.html';
+        return;
+    }
+
+    if (!bookId || !bookDatabase[bookId]) return;
+    const book = bookDatabase[bookId];
+    const qty = parseInt(document.getElementById('qty-input').value);
+    finalPrice = qty * book.price;
+
+    document.getElementById('modal-total').innerText = `Tổng cộng: ${finalPrice.toLocaleString('vi-VN')} đ`;
+    document.getElementById('buyNowModal').style.display = 'flex';
+}
+
+function confirmPurchase() {
+    const currentUser = sessionStorage.getItem('tenKhachHang'); // Lấy tên tài khoản
+    const name = document.getElementById('buyer-name').value.trim();
+    const phone = document.getElementById('buyer-phone').value.trim();
+    const address = document.getElementById('buyer-address').value.trim();
+    const method = document.querySelector('input[name="pay-method"]:checked').value;
+
+    if (!name || !phone || !address) {
+        alert("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+
+    let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+    const orderSequence = orders.length + 1;
+    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const now = new Date();
+    const exactTime = now.toLocaleTimeString('vi-VN') + ' ' + now.toLocaleDateString('vi-VN');
+
+    const newOrder = {
+        id: '#ORD-' + orderSequence + '-' + randomStr,
+        date: exactTime,
+        username: currentUser, // <-- GẮN MÁC CHỦ NHÂN ĐƠN HÀNG VÀO ĐÂY NỮA
+        customerName: name,
+        phone: phone,
+        address: address,
+        total: finalPrice,
+        method: method,
+        status: 'Chờ xác nhận'
+    };
+
+    orders.push(newOrder);
+    localStorage.setItem('adc_orders', JSON.stringify(orders));
+
+    alert("Đặt hàng thành công!");
+    window.location.href = "gio-hang.html";
+}
 </script>
+<!-- Modal Mua Ngay (Popup hiện lên để nhập thông tin) -->
+<div id="buyNowModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 25px; border-radius: 8px; width: 400px; position: relative; font-family: sans-serif;">
+        <span onclick="document.getElementById('buyNowModal').style.display='none'" style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px;">&times;</span>
+        <h2 style="margin-top: 0; text-align: center; color: #2c3e50;">Thanh Toán Nhanh</h2>
+        <p id="modal-total" style="text-align: center; font-weight: bold; color: #e74c3c;"></p>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Họ tên (*):</label>
+            <input type="text" id="buyer-name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Số điện thoại (*):</label>
+            <input type="text" id="buyer-phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold;">Địa chỉ (*):</label>
+            <textarea id="buyer-address" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" rows="2"></textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Phương thức:</label><br>
+            <input type="radio" name="pay-method" value="cod" checked onchange="document.getElementById('qr-img').style.display='none'"> Tiền mặt
+            <input type="radio" name="pay-method" value="qr" onchange="document.getElementById('qr-img').style.display='block'"> Quét QR
+        </div>
+
+        <div id="qr-img" style="display: none; text-align: center; margin-bottom: 15px;">
+            <img src="https://api.vietqr.io/image/970436-0987654321-123456?amount=0&addInfo=ThanhToanBookstore" style="width: 150px; border: 1px dashed #3498db;">
+        </div>
+
+        <button onclick="confirmPurchase()" style="width: 100%; padding: 12px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">XÁC NHẬN ĐẶT HÀNG</button>
+    </div>
+</div>
 
 </body>
 </html>

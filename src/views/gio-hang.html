@@ -1,10 +1,479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sách - Bookstore</title>
+    <link rel="stylesheet" href="../assets/css/dinh-dang.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<header>
+    <div class="logo">🐵 BOOKSTORE</div>
+    <div class="search-bar" style="position: relative;">
+        <!-- Bắt buộc phải có id="search-input" -->
+        <input type="text" id="search-input" placeholder="Tìm kiếm sách bạn yêu thích..." autocomplete="off">
+        <!-- Bắt buộc phải có hộp này để chứa gợi ý -->
+        <div id="search-suggestions" class="suggestions-box"></div>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="danh-muc-sach.html">Sách</a></li>
+            <li><a href="gio-hang.html">Giỏ hàng</a></li>
+            <li id="menu-login"><a href="dang-nhap.html">Đăng nhập</a></li>
+        </ul>
+    </nav>
+</header>
+
+
+<div class="cart-container">
+    <h1>Giỏ Hàng</h1>
+    <a href="index.html" style="text-decoration: none; color: #2563eb;">&larr; Trở về trang chủ</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width: 10%;"><input type="checkbox" id="selectAll"> Tất cả</th>
+            <th style="width: 35%;">Sản phẩm</th>
+            <th style="width: 15%;">Đơn giá</th>
+            <th style="width: 15%;">Số lượng</th>
+            <th style="width: 15%;">Thành tiền</th>
+            <th style="width: 10%;">Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="cart-body"></tbody>
+    </table>
+
+    <div class="checkout-bar">
+        <div><input type="checkbox" id="selectAllBottom"> <label for="selectAllBottom">Chọn tất cả</label></div>
+        <div class="total-price" id="totalPrice">Tổng thanh toán (0 sản phẩm): 0đ</div>
+        <button class="btn-checkout" id="btnShowCheckout">Đặt hàng</button>
+    </div>
+</div>
+
+<div class="cart-container">
+    <h2 style="margin-top: 0; color: #2c3e50;">📦 Theo dõi đơn hàng của bạn</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Mã Đơn</th>
+            <th>Ngày Đặt</th>
+            <th>Tổng Tiền</th>
+            <th>Trạng Thái</th>
+        </tr>
+        </thead>
+        <tbody id="tracking-body">
+        </tbody>
+    </table>
+</div>
+
+<div class="modal" id="checkoutModal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2 style="margin-top: 0; text-align: center;">Thông Tin Đặt Hàng</h2>
+        <p id="modalTotal" style="font-weight: bold; color: #e11d48; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 15px; text-align: center;"></p>
+
+        <div class="form-group">
+            <label for="txtName">Họ và tên người nhận (*):</label>
+            <input type="text" id="txtName" placeholder="Nhập họ tên...">
+        </div>
+        <div class="form-group">
+            <label for="txtPhone">Số điện thoại (*):</label>
+            <input type="text" id="txtPhone" placeholder="Ví dụ: 0912345678...">
+        </div>
+        <div class="form-group">
+            <label for="txtAddress">Địa chỉ giao hàng (*):</label>
+            <textarea id="txtAddress" rows="2" placeholder="Số nhà, Tên đường, Phường/Xã..."></textarea>
+        </div>
+
+        <div style="font-weight: bold; color: #333;">Phương thức thanh toán:</div>
+        <div class="radio-group">
+            <label><input type="radio" name="payMethod" value="cod" checked> Thanh toán trực tiếp</label>
+            <label><input type="radio" name="payMethod" value="qr"> Quét mã QR</label>
+        </div>
+        <div id="qrArea" class="qr-box">[ MÃ QR ]</div>
+
+        <button class="btn-confirm" id="btnConfirmOrder">Xác Nhận Đặt Hàng</button>
+    </div>
+</div>
+
+<script>
+    const cartBody = document.getElementById('cart-body');
+    const trackingBody = document.getElementById('tracking-body');
+    const selectAll = document.getElementById('selectAll');
+    const selectAllBottom = document.getElementById('selectAllBottom');
+    const totalPriceEl = document.getElementById('totalPrice');
+
+    let checkedIndexes = new Set();
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let currentTotalToPay = 0;
+
+    function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
+
+    function renderCart() {
+        cartBody.innerHTML = '';
+        if(cart.length === 0) {
+            cartBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">Giỏ hàng của bạn đang trống</td></tr>';
+            selectAll.checked = false; selectAllBottom.checked = false;
+            calculateTotal();
+            return;
+        }
+
+        cart.forEach((item, index) => {
+            const isChecked = checkedIndexes.has(index) ? 'checked' : '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="item-check" data-index="${index}" ${isChecked}></td>
+                <td><img src="${item.image}" class="item-img">${item.title}</td>
+                <td>${item.price.toLocaleString('vi-VN')}đ</td>
+                <td>
+                    <div class="qty-box">
+                        <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                        <input type="text" class="qty-input" value="${item.quantity}" readonly>
+                        <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                    </div>
+                </td>
+                <td style="font-weight:bold; color: #e11d48;">${(item.price * item.quantity).toLocaleString('vi-VN')}đ</td>
+                <td><button class="btn-delete" onclick="removeItem(${index})">Xóa</button></td>
+            `;
+            cartBody.appendChild(tr);
+        });
+        attachCheckboxListeners(); calculateTotal();
+    }
+
+    // Hiển thị lịch sử đơn hàng
+    function renderTrackingOrders() {
+        let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+        const currentUser = sessionStorage.getItem('tenKhachHang');
+        trackingBody.innerHTML = '';
+
+        // Nếu chưa đăng nhập thì báo không có dữ liệu
+        if (!currentUser) {
+            trackingBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Vui lòng đăng nhập để xem lịch sử đơn hàng của bạn</td></tr>';
+            return;
+        }
+
+        // Lọc ra ĐÚNG những đơn hàng của tài khoản đang đăng nhập
+        let myOrders = orders.filter(order => order.username === currentUser);
+
+        if(myOrders.length === 0) {
+            trackingBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Bạn chưa có đơn hàng nào</td></tr>';
+            return;
+        }
+
+        myOrders.reverse().forEach(order => {
+            let statusClass = order.status === 'Chờ xác nhận' ? 'status-pending' : 'status-approved';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${order.id}</strong></td>
+                <td>${order.date}</td>
+                <td style="color: #e11d48; font-weight: bold;">${order.total.toLocaleString('vi-VN')}đ</td>
+                <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+            `;
+            trackingBody.appendChild(tr);
+        });
+    }
+
+    window.updateQty = function(index, change) {
+        if (cart[index].quantity + change > 0) {
+            cart[index].quantity += change;
+            saveCart(); renderCart();
+        }
+    };
+
+    window.removeItem = function(index) {
+        if(confirm('Xóa sản phẩm này?')) {
+            cart.splice(index, 1);
+            let newChecked = new Set();
+            checkedIndexes.forEach(idx => {
+                if (idx < index) newChecked.add(idx);
+                if (idx > index) newChecked.add(idx - 1);
+            });
+            checkedIndexes = newChecked;
+            saveCart(); renderCart();
+        }
+    };
+
+    function calculateTotal() {
+        const checkboxes = document.querySelectorAll('.item-check');
+        let total = 0; let count = 0;
+        checkboxes.forEach((cb) => {
+            if(cb.checked) {
+                const index = parseInt(cb.getAttribute('data-index'));
+                total += cart[index].price * cart[index].quantity;
+                count++;
+            }
+        });
+        currentTotalToPay = total;
+        totalPriceEl.innerText = `Tổng thanh toán (${count} sản phẩm): ${total.toLocaleString('vi-VN')}đ`;
+        return { total, count };
+    }
+
+    function attachCheckboxListeners() {
+        document.querySelectorAll('.item-check').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                e.target.checked ? checkedIndexes.add(index) : checkedIndexes.delete(index);
+                if(!e.target.checked) { selectAll.checked = false; selectAllBottom.checked = false; }
+                calculateTotal();
+            });
+        });
+    }
+
+    function handleSelectAll(e) {
+        const isChecked = e.target.checked;
+        selectAll.checked = isChecked; selectAllBottom.checked = isChecked;
+        checkedIndexes.clear();
+        if (isChecked) cart.forEach((_, index) => checkedIndexes.add(index));
+        renderCart();
+    }
+
+    selectAll.addEventListener('change', handleSelectAll);
+    selectAllBottom.addEventListener('change', handleSelectAll);
+
+    // XỬ LÝ ĐẶT HÀNG
+    const modal = document.getElementById('checkoutModal');
+    document.getElementById('btnShowCheckout').addEventListener('click', () => {
+        // Kiểm tra xem đã đăng nhập chưa
+        const currentUser = sessionStorage.getItem('tenKhachHang');
+        if (!currentUser) {
+            alert('Bạn cần đăng nhập để tiến hành đặt hàng!');
+            window.location.href = 'dang-nhap.html'; // Chuyển hướng sang trang đăng nhập
+            return;
+        }
+
+        if (checkedIndexes.size === 0) return alert('Vui lòng chọn ít nhất 1 sản phẩm!');
+        document.getElementById('modalTotal').innerText = `Tổng tiền cần thanh toán: ${currentTotalToPay.toLocaleString('vi-VN')}đ`;
+        modal.style.display = 'flex';
+    });
+    document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+
+    document.getElementsByName('payMethod').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('qrArea').style.display = e.target.value === 'qr' ? 'block' : 'none';
+        });
+    });
+
+    document.getElementById('btnConfirmOrder').addEventListener('click', () => {
+        const currentUser = sessionStorage.getItem('tenKhachHang'); // Lấy tên tài khoản
+        const name = document.getElementById('txtName').value.trim();
+        const phone = document.getElementById('txtPhone').value.trim();
+        const address = document.getElementById('txtAddress').value.trim();
+
+        if (!name || !phone || !address) {
+            alert('Vui lòng nhập đầy đủ Tên, Số điện thoại và Địa chỉ!');
+            return;
+        }
+
+        let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+        const orderSequence = orders.length + 1;
+        const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const now = new Date();
+        const exactTime = now.toLocaleTimeString('vi-VN') + ' ' + now.toLocaleDateString('vi-VN');
+
+        const newOrder = {
+            id: '#ORD-' + orderSequence + '-' + randomStr,
+            date: exactTime,
+            username: currentUser, // <-- THÊM DÒNG NÀY ĐỂ GẮN MÁC CHỦ NHÂN ĐƠN HÀNG
+            customerName: name,
+            phone: phone,
+            address: address,
+            total: currentTotalToPay,
+            status: 'Chờ xác nhận'
+        };
+
+        orders.push(newOrder);
+        localStorage.setItem('adc_orders', JSON.stringify(orders));
+
+        alert('Đặt hàng thành công! Đơn hàng sẽ được chuyển đến Admin.');
+
+        cart = cart.filter((_, index) => !checkedIndexes.has(index));
+        checkedIndexes.clear(); saveCart();
+
+        modal.style.display = 'none';
+        renderCart();
+        renderTrackingOrders();
+    });
+
+    renderCart();
+    renderTrackingOrders();
+</script>
+
+<script>
+    // Khi trang web vừa tải xong thì chạy đoạn code này
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lục tìm trong bộ nhớ xem có tên khách hàng không
+        var tenUser = sessionStorage.getItem('tenKhachHang');
+
+        if (tenUser) { // Nếu có người đang đăng nhập
+            var menuLogin = document.getElementById('menu-login');
+
+            // 1. Đổi chữ thành tên người dùng (màu cam cho nổi bật)
+            // 2. Thêm nút "Đăng xuất" nhỏ ngay bên cạnh
+            menuLogin.innerHTML = `
+                <a href="#" style="color: #f39c12; font-weight: bold;">👋 Chào, ${tenUser}</a>
+                <a href="#" onclick="dangXuat()" style="font-size: 12px; color: #e74c3c; margin-left: 5px; cursor: pointer;">(Thoát)</a>
+            `;
+        }
+    });
+
+    // Hàm xử lý khi bấm nút (Thoát)
+    function dangXuat() {
+        sessionStorage.removeItem('tenKhachHang'); // Xóa tên khỏi bộ nhớ
+        window.location.reload(); // Tải lại trang web về trạng thái ban đầu
+    }
+</script>
+
+<!-- ==============================================
+     JAVASCRIPT: THANH TÌM KIẾM THÔNG MINH (TÊN, TÁC GIẢ, THỂ LOẠI)
+     ============================================== -->
+<script>
+    // 1. KHO DỮ LIỆU ĐẦY ĐỦ 56 CUỐN SÁCH CỦA BOOKSTORE
+    const bookDatabase = {
+        "ba-tuoc-monte-cristo": { id: "ba-tuoc-monte-cristo", title: "Bá tước Monte Cristo", price: 185000, img: "../assets/images/ba-tuoc-monte-cristo.jpg", author: "Alexandre Dumas", category: "Văn học" },
+        "giet-con-chim-nhai": { id: "giet-con-chim-nhai", title: "Giết con chim nhại", price: 210000, img: "../assets/images/giet-con-chim-nhai.jpg", author: "Harper Lee", category: "Văn học" },
+        "hai-so-phan": { id: "hai-so-phan", title: "Hai số phận", price: 320000, img: "../assets/images/hai-so-phan.jpg", author: "Jeffrey Archer", category: "Văn học" },
+        "khong-gia-dinh": { id: "khong-gia-dinh", title: "Không gia đình", price: 450000, img: "../assets/images/khong-gia-dinh.jpg", author: "Hector Malot", category: "Văn học" },
+        "phia-sau-nghi-can-x": { id: "phia-sau-nghi-can-x", title: "Phía sau nghi can X", price: 230000, img: "../assets/images/phia-sau-nghi-can-x.png", author: "Keigo Higashino", category: "Trinh thám" },
+        "rung-nauy": { id: "rung-nauy", title: "Rừng Nauy", price: 240000, img: "../assets/images/rung-nauy.png", author: "Haruki Murakami", category: "Văn học" },
+        "bo-gia": { id: "bo-gia", title: "Bố Già", price: 105000, img: "../assets/images/bo-gia.png", author: "Mario Puzo", category: "Văn học" },
+        "nhung-nguoi-khon-kho": { id: "nhung-nguoi-khon-kho", title: "Những người khốn khổ", price: 285000, img: "../assets/images/nhung-nguoi-khon-kho.png", author: "Victor Hugo", category: "Văn học" },
+        "phia-tay-khong-co-gi-la": { id: "phia-tay-khong-co-gi-la", title: "Phía tây không có gì lạ", price: 50000, img: "../assets/images/phia-tay-khong-co-gi-la.png", author: "Erich Maria Remarque", category: "Văn học" },
+        "tuoi-tre-dang-gia-bao-nhieu": { id: "tuoi-tre-dang-gia-bao-nhieu", title: "Tuổi trẻ đáng giá bao nhiêu", price: 80000, img: "../assets/images/tuoi-tre-dang-gia-bao-nhieu.png", author: "Rosie Nguyễn", category: "Kỹ năng" },
+        "cay-cam-ngot-cua-toi": { id: "cay-cam-ngot-cua-toi", title: "Cây Cam Ngọt Của Tôi", price: 81000, img: "../assets/images/cay-cam-ngot-cua-toi.png", author: "José Mauro de Vasconcelos", category: "Văn học" },
+        "khong-diet-khong-sinh-dung-so-hai": { id: "khong-diet-khong-sinh-dung-so-hai", title: "Không Diệt Không Sinh Đừng Sợ Hãi", price: 82500, img: "../assets/images/q2.png", author: "Thích Nhất Hạnh", category: "Kỹ năng" },
+        "khi-hoi-tho-hoa-thinh-khong": { id: "khi-hoi-tho-hoa-thinh-khong", title: "Khi Hơi Thở Hóa Thinh Không", price: 81750, img: "../assets/images/q3.png", author: "Paul Kalanithi", category: "Văn học" },
+        "dan-ong-sao-hoa-dan-ba-sao-kim": { id: "dan-ong-sao-hoa-dan-ba-sao-kim", title: "Đàn Ông Sao Hỏa Đàn Bà Sao Kim", price: 122000, img: "../assets/images/q4.png", author: "John Gray", category: "Kỹ năng" },
+        "muon-kiep-nhan-sinh": { id: "muon-kiep-nhan-sinh", title: "Muôn Kiếp Nhân Sinh", price: 117600, img: "../assets/images/q5.png", author: "Nguyên Phong", category: "Văn học" },
+        "tieng-han-tong-hop-so-cap-1": { id: "tieng-han-tong-hop-so-cap-1", title: "Tiếng Hàn Tổng Hợp - Sơ Cấp 1", price: 148500, img: "../assets/images/q6.png", author: "Nhiều Tác Giả", category: "Ngoại ngữ" },
+        "dac-nhan-tam": { id: "dac-nhan-tam", title: "Đắc Nhân Tâm", price: 56000, img: "../assets/images/dac-nhan-tam.jpg", author: "Dale Carnegie", category: "Kỹ năng" },
+        "day-con-lam-giau-01": { id: "day-con-lam-giau-01", title: "Dạy Con Làm Giàu 01", price: 62000, img: "../assets/images/q8.png", author: "Robert T. Kiyosaki", category: "Kinh tế" },
+        "hieu-ve-trai-tim": { id: "hieu-ve-trai-tim", title: "Hiểu Về Trái Tim", price: 119000, img: "../assets/images/q9.png", author: "Thích Minh Niệm", category: "Kỹ năng" },
+        "ngon-ngu-co-the": { id: "ngon-ngu-co-the", title: "Ngôn Ngữ Cơ Thể", price: 158000, img: "../assets/images/q10.png", author: "Allan Pease", category: "Kỹ năng" },
+        "cam-on-nguoi-lon": { id: "cam-on-nguoi-lon", title: "Cảm Ơn Người Lớn", price: 84700, img: "../assets/images/q11.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "thay-doi-cuoc-song-voi-nhan-so-hoc": { id: "thay-doi-cuoc-song-voi-nhan-so-hoc", title: "Thay Đổi Cuộc Sống Với Nhân Số Học", price: 173600, img: "../assets/images/q12.png", author: "Lê Đỗ Quỳnh Hương", category: "Kỹ năng" },
+        "khoi-nghiep-ban-le": { id: "khoi-nghiep-ban-le", title: "Khởi Nghiệp Bán Lẻ", price: 125000, img: "../assets/images/q13.png", author: "Trần Thanh Phong", category: "Kinh tế" },
+        "muon-kiep-nhan-sinh-tap-2": { id: "muon-kiep-nhan-sinh-tap-2", title: "Muôn Kiếp Nhân Sinh - Tập 2", price: 187600, img: "../assets/images/q14.png", author: "Nguyên Phong", category: "Văn học" },
+        "lam-ban-voi-bau-troi": { id: "lam-ban-voi-bau-troi", title: "Làm Bạn Với Bầu Trời", price: 169400, img: "../assets/images/q15.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "tam-ly-hoc-toi-pham": { id: "tam-ly-hoc-toi-pham", title: "Tâm Lý Học Tội Phạm", price: 94000, img: "../assets/images/q17.png", author: "Stanton E. Samenow", category: "Tâm lý" },
+        "thien-tai-ben-trai-ke-dien-ben-phai": { id: "thien-tai-ben-trai-ke-dien-ben-phai", title: "Thiên Tài Bên Trái, Kẻ Điên Bên Phải", price: 116000, img: "../assets/images/q18.png", author: "Cao Minh", category: "Tâm lý" },
+        "tam-ly-hoc-ve-tien": { id: "tam-ly-hoc-ve-tien", title: "Tâm Lý Học Về Tiền", price: 141500, img: "../assets/images/q20.png", author: "Morgan Housel", category: "Tâm lý" },
+        "cay-chuoi-non-di-giay-xanh": { id: "cay-chuoi-non-di-giay-xanh", title: "Cây Chuối Non Đi Giày Xanh", price: 84700, img: "../assets/images/q21.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau": { id: "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau", title: "Tự Học Tiếng Trung Cho Người Mới Bắt Đầu", price: 85500, img: "../assets/images/q26.png", author: "MCBooks", category: "Ngoại ngữ" },
+        "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat": { id: "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat", title: "Ông Trăm Tuổi Trèo Qua Cửa Sổ Và Biến Mất", price: 146300, img: "../assets/images/q28.png", author: "Jonas Jonasson", category: "Văn học" },
+        "nguoi-dua-dieu": { id: "nguoi-dua-dieu", title: "Người Đua Diều", price: 146300, img: "../assets/images/q29.png", author: "Khaled Hosseini", category: "Văn học" },
+        "think-and-grow-rich": { id: "think-and-grow-rich", title: "Think And Grow Rich", price: 77000, img: "../assets/images/q31.png", author: "Napoleon Hill", category: "Kinh tế" },
+        "nguoi-giau-co-nhat-thanh-babylon": { id: "nguoi-giau-co-nhat-thanh-babylon", title: "Người Giàu Có Nhất Thành Babylon", price: 74000, img: "../assets/images/q32.png", author: "George S. Clason", category: "Kinh tế" },
+        "lam-giau-tu-chung-khoan": { id: "lam-giau-tu-chung-khoan", title: "Làm Giàu Từ Chứng Khoán", price: 700000, img: "../assets/images/q34.png", author: "William J. O'Neil", category: "Kinh tế" },
+        "ghi-chep-phap-y-nhung-cai-chet-bi-an": { id: "ghi-chep-phap-y-nhung-cai-chet-bi-an", title: "Ghi Chép Pháp Y - Những Cái Chết Bí Ẩn", price: 112500, img: "../assets/images/q41.png", author: "Pháp y Tần Minh", category: "Trinh thám" },
+        "kheo-an-noi-se-co-duoc-thien-ha": { id: "kheo-an-noi-se-co-duoc-thien-ha", title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ", price: 118000, img: "../assets/images/q45.png", author: "Trác Nhã", category: "Tâm lý" },
+        "nha-gia-kim": { id: "nha-gia-kim", title: "Nhà giả kim", price: 100000, img: "../assets/images/nha-gia-kim.jpg", author: "Paulo Coelho", category: "Văn học" },
+        "90-tre-thong-minh-nho-tro-chuyen": { id: "90-tre-thong-minh-nho-tro-chuyen", title: "90% Trẻ Thông Minh Nhờ Trò Chuyện", price: 33000, img: "../assets/images/q16.png", author: "Fukuda Takeshi", category: "Kỹ năng" },
+        "bi-mat-cua-phan-thien-an": { id: "bi-mat-cua-phan-thien-an", title: "Bí Mật Của Phan Thiên Ân", price: 69000, img: "../assets/images/q19.png", author: "Tiến sĩ Alan Phan", category: "Kỹ năng" },
+        "co-hai-con-meo-ngoi-ben-cua-so": { id: "co-hai-con-meo-ngoi-ben-cua-so", title: "Có Hai Con Mèo Ngồi Bên Cửa Sổ", price: 77000, img: "../assets/images/q22.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "hanh-tinh-cua-mot-ke-nghi-nhieu": { id: "hanh-tinh-cua-mot-ke-nghi-nhieu", title: "Hành Tinh Của Một Kẻ Nghĩ Nhiều", price: 56000, img: "../assets/images/q23.png", author: "Nguyễn Đoàn Minh Đức", category: "Tâm lý" },
+        "tu-dien-tieng-em": { id: "tu-dien-tieng-em", title: "Từ Điển Tiếng 'Em'", price: 55000, img: "../assets/images/q24.png", author: "Khotudien", category: "Văn học" },
+        "di-tim-le-song": { id: "di-tim-le-song", title: "Đi Tìm Lẽ Sống", price: 62000, img: "../assets/images/q25.png", author: "Viktor E. Frankl", category: "Tâm lý" },
+        "cho-toi-xin-mot-ve-di-tuoi-tho": { id: "cho-toi-xin-mot-ve-di-tuoi-tho", title: "Cho Tôi Xin Một Vé Đi Tuổi Thơ", price: 69300, img: "../assets/images/q27.png", author: "Nguyễn Nhật Ánh", category: "Văn học" },
+        "bien-moi-thu-thanh-tien": { id: "bien-moi-thu-thanh-tien", title: "Biến Mọi Thứ Thành Tiền", price: 109000, img: "../assets/images/q30.png", author: "Tetsuya Ishida", category: "Kinh tế" },
+        "combo-sach-english": { id: "combo-sach-english", title: "Combo sách English", price: 85500, img: "../assets/images/q33.png", author: "Nhiều Tác Giả", category: "Ngoại ngữ" },
+        "lam-giau-tu-chung-khoan-bo-2-cuon": { id: "lam-giau-tu-chung-khoan-bo-2-cuon", title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, img: "../assets/images/q34.png", author: "William J. O'Neil", category: "Kinh tế" },
+        "khong-so-cham-chi-so-dung": { id: "khong-so-cham-chi-so-dung", title: "Không Sợ Chậm Chỉ Sợ Dừng", price: 84000, img: "../assets/images/q35.png", author: "Vương Giác", category: "Kỹ năng" },
+        "vi-than-cua-nhung-quyet-dinh": { id: "vi-than-cua-nhung-quyet-dinh", title: "Vị Thần Của Những Quyết Định", price: 51000, img: "../assets/images/q37.png", author: "Nhiều Tác Giả", category: "Kỹ năng" },
+        "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban": { id: "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban", title: "Thỏ Bảy Màu Và Những Người Nghĩ Nó Là Bạn", price: 79000, img: "../assets/images/q38.png", author: "Huỳnh Thái Ngọc", category: "Văn học" },
+        "muon-kiep-nhan-sinh-tap-3": { id: "muon-kiep-nhan-sinh-tap-3", title: "Muôn Kiếp Nhân Sinh - Tập 3", price: 152600, img: "../assets/images/q39.png", author: "Nguyên Phong", category: "Văn học" },
+        "to-binh-yen-ve-hanh-phuc": { id: "to-binh-yen-ve-hanh-phuc", title: "Tô Bình Yên Vẽ Hạnh Phúc", price: 70000, img: "../assets/images/q40.png", author: "Kulzsc", category: "Kỹ năng" },
+        "thuat-thao-tung": { id: "thuat-thao-tung", title: "Thuật Thao Túng", price: 89600, img: "../assets/images/q42.png", author: "Henrik Fexeus", category: "Kỹ năng" },
+        "khong-phai-soi-nhung-cung-dung-la-cuu": { id: "khong-phai-soi-nhung-cung-dung-la-cuu", title: "Không Phải Sói Nhưng Cũng Đừng Là Cừu", price: 92000, img: "../assets/images/q44.png", author: "Lê Bảo Tôn", category: "Văn học" },
+        "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong": { id: "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong", title: "Nói Chuyện Là Bản Năng, Giữ Miệng Là Tu Dưỡng", price: 123000, img: "../assets/images/q48.png", author: "Trương Tiếu Hằng", category: "Kỹ năng" }
+    };
+
+    // Chuyển Object thành dạng Mảng (Array) để dễ dàng lọc
+    const danhSachTimKiem = Object.values(bookDatabase);
+
+    // 2. HÀM CHUẨN HÓA TIẾNG VIỆT (Bỏ dấu, viết thường)
+    function xoaDau(str) {
+        if (!str) return ""; // Tránh lỗi nếu dữ liệu bị rỗng
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+    }
+
+    // 3. BẮT ĐẦU XỬ LÝ LỌC SÁCH
+    const oTimKiem = document.getElementById('search-input');
+    const hopGoiY = document.getElementById('search-suggestions');
+
+    if (oTimKiem && hopGoiY) {
+        oTimKiem.addEventListener('input', function() {
+            const tuKhoa = xoaDau(this.value.trim()); // Chữ khách hàng vừa gõ
+            hopGoiY.innerHTML = ''; // Xóa sạch kết quả cũ
+
+            if (tuKhoa.length > 0) {
+                // ĐIỀU KIỆN 3 TRONG 1: TÊN SÁCH || TÁC GIẢ || THỂ LOẠI
+                const ketQua = danhSachTimKiem.filter(sach => {
+                    const tenSachKhongDau = xoaDau(sach.title);
+                    const tenTacGiaKhongDau = xoaDau(sach.author);
+                    const theLoaiKhongDau = xoaDau(sach.category);
+
+                    return tenSachKhongDau.includes(tuKhoa) ||
+                           tenTacGiaKhongDau.includes(tuKhoa) ||
+                           theLoaiKhongDau.includes(tuKhoa);
+                });
+
+                if (ketQua.length > 0) {
+                    hopGoiY.style.display = 'block'; // Hiện hộp gợi ý
+
+                    // In từng cuốn sách ra HTML
+                    ketQua.forEach(sach => {
+                        const theA = document.createElement('a');
+                        theA.href = `chi-tiet-sach.html?id=${sach.id}`;
+                        theA.className = 'suggestion-item';
+
+                        const giaTien = sach.price.toLocaleString('vi-VN') + ' đ';
+
+                        theA.innerHTML = `
+                            <img src="${sach.img}" alt="${sach.title}">
+                            <div class="suggestion-item-info">
+                                <h4>${sach.title}</h4>
+                                <p>${giaTien}</p>
+                            </div>
+                        `;
+                        hopGoiY.appendChild(theA);
+                    });
+                } else {
+                    hopGoiY.style.display = 'none'; // Không có kết quả thì ẩn đi
+                }
+            } else {
+                hopGoiY.style.display = 'none'; // Xóa hết chữ trên ô tìm kiếm cũng ẩn đi
+            }
+        });
+
+// BẮT SỰ KIỆN KHI NGƯỜI DÙNG BẤM PHÍM ENTER
+        oTimKiem.addEventListener('keypress', function(event) {
+            // Kiểm tra xem phím vừa bấm có phải là Enter không
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                const tuKhoa = this.value.trim(); // Lấy chữ khách vừa gõ
+
+                if (tuKhoa.length > 0) {
+                    // Nhảy sang trang Danh mục sách và "xách" theo từ khóa trên URL
+                    // Ví dụ: danh-muc-sach.html?search=nha%20gia%20kim
+                    window.location.href = `danh-muc-sach.html?search=${encodeURIComponent(tuKhoa)}`;
+                }
+            }
+        });
+
+        // 4. BẤM CHUỘT RA NGOÀI THÌ TỰ ĐỘNG ẨN HỘP GỢI Ý
+        document.addEventListener('click', function(event) {
+            if (!oTimKiem.contains(event.target) && !hopGoiY.contains(event.target)) {
+                hopGoiY.style.display = 'none';
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

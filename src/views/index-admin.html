@@ -190,11 +190,11 @@
     <div class="card-stats">
         <div class="stat-card">
             <h3>Tổng doanh thu (Tháng)</h3>
-            <div class="value" style="color: #3498db;">45.200.000đ</div>
+            <div id="admin-total-revenue" class="value" style="color: #3498db;">45.200.000đ</div>
         </div>
         <div class="stat-card">
             <h3>Đơn hàng chờ duyệt</h3>
-            <div class="value" style="color: #2ecc71;">18</div>
+            <div id="admin-pending-count" class="value" style="color: #2ecc71;">18</div>
         </div>
         <div class="stat-card">
             <h3>Khách hàng mới</h3>
@@ -220,30 +220,11 @@
                 <th>Hành Động</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td><strong>#ORD-099</strong></td>
-                <td>28/04/2026</td>
-                <td>Nguyễn Văn A</td>
-                <td>350.000đ</td>
-                <td><span style="background: #f1c40f; color: #000; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">Chờ xác nhận</span></td>
-                <td>
-                    <button class="btn btn-add" style="padding: 5px 15px; font-size: 12px;">Duyệt</button>
-                    <button class="btn btn-delete" style="padding: 5px 15px; font-size: 12px; margin-left: 5px;">Hủy</button>
-                </td>
-            </tr>
-            <tr>
-                <td><strong>#ORD-098</strong></td>
-                <td>28/04/2026</td>
-                <td>Trần Thị B</td>
-                <td>1.250.000đ</td>
-                <td><span style="background: #f1c40f; color: #000; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">Chờ xác nhận</span></td>
-                <td>
-                    <button class="btn btn-add" style="padding: 5px 15px; font-size: 12px;">Duyệt</button>
-                    <button class="btn btn-delete" style="padding: 5px 15px; font-size: 12px; margin-left: 5px;">Hủy</button>
-                </td>
-            </tr>
+            <!-- Thêm id="admin-order-body" và xóa các dòng <tr> mẫu đi -->
+            <tbody id="admin-order-body">
+            <!-- Dữ liệu sẽ tự đổ vào đây -->
             </tbody>
+
         </table>
     </div>
 
@@ -257,7 +238,79 @@
             window.location.href = 'dang-nhap.html';
         }
     }
-</script>
+// 1. Hàm tải dữ liệu và hiển thị lên giao diện Admin
+function renderAdminDashboard() {
+    const orderBody = document.getElementById('admin-order-body');
+    const pendingCountEl = document.getElementById('admin-pending-count');
+    const totalRevenueEl = document.getElementById('admin-total-revenue');
 
+    // Lấy đơn hàng từ "kho" adc_orders
+    let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+
+    let pendingCount = 0;
+    let totalRevenue = 0;
+    let html = '';
+
+    // Lọc và hiển thị các đơn hàng
+    orders.forEach((order, index) => {
+        // Tính toán doanh thu (chỉ tính đơn đã duyệt)
+        if (order.status === 'Đã duyệt') {
+            totalRevenue += order.total;
+        }
+
+        // Chỉ hiển thị đơn hàng "Chờ xác nhận" ra bảng ở Dashboard theo yêu cầu của bạn
+        if (order.status === 'Chờ xác nhận') {
+            pendingCount++;
+            html += `
+                <tr>
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.date}</td>
+                    <td>${order.customerName}</td>
+                    <td>${order.total.toLocaleString('vi-VN')}đ</td>
+                    <td><span style="background: #f1c40f; color: #000; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">Chờ xác nhận</span></td>
+                    <td>
+                        <button onclick="updateOrderStatus('${order.id}', 'Đã duyệt')" class="btn btn-add" style="padding: 5px 15px; font-size: 12px; cursor:pointer;">Duyệt</button>
+                        <button onclick="updateOrderStatus('${order.id}', 'Đã hủy')" class="btn btn-delete" style="padding: 5px 15px; font-size: 12px; margin-left: 5px; cursor:pointer;">Hủy</button>
+                    </td>
+                </tr>
+            `;
+        }
+    });
+
+    // Nếu không có đơn nào chờ duyệt
+    if (html === '') {
+        html = '<tr><td colspan="6" style="text-align:center; padding:20px;">Không có đơn hàng nào mới cần duyệt.</td></tr>';
+    }
+
+    // Cập nhật số liệu lên các Card
+    orderBody.innerHTML = html;
+    pendingCountEl.innerText = pendingCount;
+    totalRevenueEl.innerText = totalRevenue.toLocaleString('vi-VN') + 'đ';
+}
+
+// 2. Hàm xử lý Duyệt hoặc Hủy đơn hàng
+function updateOrderStatus(orderId, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('adc_orders')) || [];
+
+    // Tìm đơn hàng theo mã ID và cập nhật trạng thái
+    orders = orders.map(order => {
+        if (order.id === orderId) {
+            order.status = newStatus;
+        }
+        return order;
+    });
+
+    // Lưu lại vào localStorage
+    localStorage.setItem('adc_orders', JSON.stringify(orders));
+
+    // Thông báo và tải lại bảng
+    alert(`${newStatus} đơn hàng ${orderId} thành công!`);
+    renderAdminDashboard();
+}
+
+// 3. Chạy hàm ngay khi trang Admin vừa tải xong
+document.addEventListener('DOMContentLoaded', renderAdminDashboard);
+</script>
 </body>
 </html>
+
