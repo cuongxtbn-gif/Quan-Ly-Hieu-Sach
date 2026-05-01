@@ -6,145 +6,70 @@
     <link rel="stylesheet" href="../assets/css/dinh-dang.css">
 
     <style>
-        /* CSS BỔ SUNG DÀNH RIÊNG CHO GIAO DIỆN ADMIN */
-        body {
-            display: flex;
-            background-color: #f4f7f6;
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* CSS CHUNG CHO ADMIN */
+        body { display: flex; background-color: #f4f7f6; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { width: 280px; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); color: white; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); overflow-y: auto; }
+        .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-header h2 { margin: 0; color: #f39c12; font-family: 'Lobster', cursive; font-size: 28px; letter-spacing: 2px; }
+        .sidebar-header p { margin: 5px 0 0 0; font-size: 12px; color: #bdc3c7; text-transform: uppercase; }
 
-        /* 1. THANH MENU BÊN TRÁI (SIDEBAR) */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
+        .admin-menu { list-style: none; padding: 0 15px; margin: 0; }
+        .admin-menu li { margin-bottom: 8px; }
+        .admin-menu a { display: flex; align-items: center; padding: 15px 20px; color: #ecf0f1; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: 8px; transition: all 0.3s ease; }
+        .admin-menu a:hover, .admin-menu a.active { background-color: #f39c12; color: #fff; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); transform: translateX(5px); }
+        .admin-menu i { margin-right: 15px; font-size: 18px; }
+        .logout-btn { margin-top: 50px; background-color: rgba(231, 76, 60, 0.2) !important; color: #e74c3c !important; border: 1px solid rgba(231, 76, 60, 0.5); }
+        .logout-btn:hover { background-color: #e74c3c !important; color: #fff !important; }
 
-        .sidebar-header {
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .page-header h1 { margin: 0; color: #2c3e50; font-size: 24px; }
 
-        .sidebar-header h2 {
-            margin: 0;
-            color: #f39c12;
-            font-family: 'Lobster', cursive;
-            font-size: 28px;
-            letter-spacing: 2px;
-        }
+        .card-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid #3498db; display: flex; flex-direction: column; justify-content: center; }
+        .stat-card:nth-child(2) { border-color: #e74c3c; }
+        .stat-card h3 { margin: 0 0 10px 0; color: #7f8c8d; font-size: 16px; text-transform: uppercase; }
+        .stat-card .value { font-size: 36px; font-weight: bold; color: #2c3e50; }
 
-        .sidebar-header p {
-            margin: 5px 0 0 0;
-            font-size: 12px;
-            color: #bdc3c7;
-            text-transform: uppercase;
-        }
+        .table-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .data-table th { background-color: #f8f9fa; color: #2c3e50; padding: 15px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #34495e; vertical-align: middle; }
+        .data-table tr:hover { background-color: #fdfdfd; }
 
-        /* Danh sách chức năng (Lấy từ sơ đồ draw.io của bạn) */
-        .admin-menu {
-            list-style: none;
-            padding: 0 15px;
-            margin: 0;
-        }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-pause { background: #fef3c7; color: #92400e; }
 
-        .admin-menu li {
-            margin-bottom: 8px;
-        }
+        .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin-right: 5px; margin-bottom: 5px;}
+        .btn-view { background-color: #9b59b6; color: white; }
+        .btn-view:hover { background-color: #8e44ad; }
+        .btn-detail { background-color: #f39c12; color: white; }
+        .btn-detail:hover { background-color: #d68910; }
+        .btn-edit { background-color: #3498db; color: white; }
+        .btn-edit:hover { background-color: #2980b9; }
+        .btn-delete { background-color: #e74c3c; color: white; margin-right: 0;}
+        .btn-delete:hover { background-color: #c0392b; }
 
-        .admin-menu a {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
+        /* MODAL CHUNG */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
+        .modal-md { width: 450px; max-width: 90%; }
+        .modal-lg { width: 850px; max-width: 95%; }
 
-        /* Hiệu ứng hover và menu đang chọn (Active) */
-        .admin-menu a:hover, .admin-menu a.active {
-            background-color: #f39c12;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
-            transform: translateX(5px); /* Trượt nhẹ sang phải */
-        }
+        .close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: 0.2s; }
+        .close:hover { color: #334155; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; outline: none; }
+        .form-group input:focus { border-color: #3498db; }
+        .btn-save { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-save:hover { background: #219150; }
 
-        .admin-menu i {
-            margin-right: 15px;
-            font-size: 18px;
-        }
+        .search-input-box { padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 280px; font-family: inherit; transition: 0.3s; }
+        .search-input-box:focus { border-color: #f39c12; box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
 
-        /* Nút đăng xuất nằm dưới cùng */
-        .logout-btn {
-            margin-top: 50px;
-            background-color: rgba(231, 76, 60, 0.2) !important;
-            color: #e74c3c !important;
-            border: 1px solid rgba(231, 76, 60, 0.5);
-        }
-        .logout-btn:hover {
-            background-color: #e74c3c !important;
-            color: #fff !important;
-            transform: translateX(0) !important;
-        }
-
-        /* 2. KHU VỰC NỘI DUNG CHÍNH (MAIN CONTENT) */
-        .main-content {
-            margin-left: 280px; /* Đẩy nội dung ra tránh cái sidebar */
-            padding: 40px;
-            width: calc(100% - 280px);
-            box-sizing: border-box;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .page-header h1 {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 24px;
-        }
-
-        /* Re-style lại mấy cái thẻ Card cho đẹp hơn */
-        .card-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border-bottom: 4px solid #3498db;
-        }
-
-        .stat-card:nth-child(2) { border-color: #2ecc71; }
-        .stat-card:nth-child(3) { border-color: #f1c40f; }
-        .stat-card:nth-child(4) { border-color: #e74c3c; }
-
-        .stat-card h3 { margin: 0 0 10px 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; }
-        .stat-card .value { font-size: 28px; font-weight: bold; color: #2c3e50; }
+        .import-grid { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 20px;}
     </style>
 </head>
 <body>
@@ -154,35 +79,570 @@
         <h2>⚙️ ADMIN</h2>
         <p>Hệ thống quản trị nội bộ</p>
     </div>
-
     <ul class="admin-menu">
-        <li>
-            <a href="index-admin.html" class="active"><i>📊</i> Thống kê Doanh thu</a>
-        </li>
-        <li>
-            <a href="quan-ly-sach.html"><i>📚</i> Quản lý Sách (Thêm/Sửa/Xóa)</a>
-        </li>
-        <li>
-            <a href="don-hang.html"><i>📦</i> Duyệt & Cập nhật Đơn hàng</a>
-        </li>
-        <li>
-            <a href="ma-giam-gia.html"><i>🎟️</i> Quản lý Mã giảm giá</a>
-        </li>
-        <li>
-            <a href="nha-cung-cap.html"><i>👥</i> Danh sách nhà cung cấp</a>
-        </li>
-
-        <li>
-            <a href="#" class="logout-btn" onclick="dangXuatAdmin()"><i>🚪</i> Đăng xuất hệ thống</a>
-        </li>
+        <li><a href="index-admin.html"><i>📊</i> Thống kê Doanh thu</a></li>
+        <li><a href="quan-ly-sach.html"><i>📚</i> Quản lý Sách (Thêm/Sửa/Xóa)</a></li>
+        <li><a href="don-hang.html"><i>📦</i> Duyệt & Cập nhật Đơn hàng</a></li>
+        <li><a href="ma-giam-gia.html"><i>🎟️</i> Quản lý Mã giảm giá</a></li>
+        <li><a href="nha-cung-cap.html" class="active"><i>👥</i> Danh sách Nhà phân phối</a></li>
+        <li><a href="#" class="logout-btn" onclick="dangXuatAdmin()"><i>🚪</i> Đăng xuất hệ thống</a></li>
     </ul>
 </div>
 
 <div class="main-content">
-
     <div class="page-header">
-        <h1>Quản lý nhà cung cấp</h1>
-        <div style="font-weight: bold; color: #34495e;">
-            👤 Admin: Quản trị viên tối cao
+        <h1>Danh sách Nhà Phân Phối</h1>
+        <div style="font-weight: bold; color: #34495e;">👤 Admin: Quản trị viên tối cao</div>
+    </div>
+
+    <!-- KHU VỰC 1: HIỂN THỊ TỔNG SỐ -->
+    <div class="card-stats">
+        <div class="stat-card">
+            <h3>Số lượng đối tác</h3>
+            <div class="value" id="tong-ncc" style="color: #3498db;">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Tổng giá trị giao dịch</h3>
+            <div class="value" id="tong-tien-chi" style="color: #e74c3c;">0 đ</div>
         </div>
     </div>
+
+    <!-- KHU VỰC 2: BẢNG DANH SÁCH -->
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; color: #2c3e50; border-left: 4px solid #f39c12; padding-left: 15px;">Danh sách chi tiết</h2>
+
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <input type="text" id="txtTimKiemNCC" class="search-input-box" placeholder="🔍 Nhập mã hoặc tên NCC..." oninput="hienThiDuLieuNCC()">
+                <button onclick="moFormThem()" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                    + Thêm mới
+                </button>
+            </div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Mã NCC</th>
+                <th>Tên Nhà Phân Phối</th>
+                <th>Số Điện Thoại</th>
+                <th>Email</th>
+                <th>Tổng Tiền Đã Nhập</th>
+                <th>Trạng Thái</th>
+                <th style="text-align: center;">Thao Tác</th>
+            </tr>
+            </thead>
+            <tbody id="bang-nha-cung-cap">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==============================================
+     CÁC MODAL (POPUP) CHỨC NĂNG
+     ============================================== -->
+
+<!-- 1. MODAL QUẢN LÝ THÊM/SỬA NCC -->
+<div id="nccModal" class="modal">
+    <div class="modal-content modal-md">
+        <span class="close" onclick="dongModal('nccModal')">&times;</span>
+        <h2 id="modalTitle" style="margin-top: 0; text-align: center; color: #2c3e50;">Thêm Nhà Phân Phối</h2>
+        <input type="hidden" id="editIndex" value="">
+
+        <div class="form-group">
+            <label>Mã NCC (*)</label>
+            <input type="text" id="txtMaNCC" placeholder="VD: NCC-007">
+        </div>
+        <div class="form-group">
+            <label>Tên Nhà Phân Phối (*)</label>
+            <input type="text" id="txtTenNCC" placeholder="VD: Nhà sách Fahasa">
+        </div>
+        <div class="form-group">
+            <label>Số Điện Thoại</label>
+            <input type="text" id="txtSDT" placeholder="Nhập số điện thoại">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="txtEmail" placeholder="Nhập email liên hệ">
+        </div>
+        <div class="form-group">
+            <label>Trạng Thái</label>
+            <select id="selTrangThai">
+                <option value="Đang hợp tác">Đang hợp tác</option>
+                <option value="Tạm dừng">Tạm dừng</option>
+            </select>
+        </div>
+        <button class="btn-save" onclick="luuNCC()">LƯU THÔNG TIN</button>
+    </div>
+</div>
+
+<!-- 2. MODAL DANH SÁCH HÓA ĐƠN -->
+<div id="hoaDonModal" class="modal">
+    <div class="modal-content modal-lg">
+        <span class="close" onclick="dongModal('hoaDonModal')">&times;</span>
+        <h2 style="margin-top: 0; color: #2c3e50;" id="hdModalTitle">Danh Sách Hóa Đơn Nhập</h2>
+
+        <div style="margin-bottom: 20px; text-align: right;">
+            <button onclick="moFormNhapHang()" style="padding: 10px 20px; background: #e67e22; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                🛒 + Tạo Đơn Nhập Hàng
+            </button>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Mã Hóa Đơn</th>
+                <th>Ngày Nhập</th>
+                <th>Số Lượng Đầu Sách</th>
+                <th>Tổng Tiền (VNĐ)</th>
+                <th style="text-align: center;">Chi Tiết</th>
+            </tr>
+            </thead>
+            <tbody id="bang-hoa-don">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 3. MODAL XEM CHI TIẾT 1 HÓA ĐƠN CỤ THỂ -->
+<div id="chiTietHDModal" class="modal" style="z-index: 1002;">
+    <div class="modal-content modal-lg">
+        <span class="close" onclick="dongModal('chiTietHDModal')">&times;</span>
+        <h2 style="margin-top: 0; color: #2c3e50;" id="chiTietTitle">Chi tiết Hóa Đơn</h2>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Mã Sách</th>
+                <th>Tên Sách</th>
+                <th>Đơn Giá</th>
+                <th>Số Lượng</th>
+                <th>Thành Tiền</th>
+            </tr>
+            </thead>
+            <tbody id="bang-chi-tiet-hd">
+            </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 20px; font-size: 20px; font-weight: bold; color: #e74c3c;" id="chiTietTotal">Tổng cộng: 0 đ</div>
+    </div>
+</div>
+
+<!-- 4. MODAL NHẬP SÁCH (TẠO HÓA ĐƠN MỚI CÓ CHỌN SÁCH) -->
+<div id="nhapHangModal" class="modal" style="z-index: 1001;">
+    <div class="modal-content modal-lg">
+        <span class="close" onclick="dongModal('nhapHangModal')">&times;</span>
+        <h2 style="margin-top: 0; text-align: center; color: #2c3e50;">Tạo Đơn Nhập Kho</h2>
+
+        <div class="form-group" style="width: 200px;">
+            <label>Ngày Nhập</label>
+            <input type="date" id="txtNgayNhap">
+        </div>
+
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+            <label style="font-weight: bold; color: #2c3e50; margin-bottom: 10px; display: block;">Chọn sách vào đơn hàng:</label>
+            <div class="import-grid">
+                <div>
+                    <select id="selSachNhap"></select>
+                </div>
+                <div>
+                    <input type="number" id="txtSoLuongNhap" placeholder="Số lượng..." value="10" min="1">
+                </div>
+                <div>
+                    <button onclick="themSachVaoLuoi()" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Thêm ⬇️</button>
+                </div>
+            </div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Tên Sách</th>
+                <th>Đơn Giá</th>
+                <th>SL</th>
+                <th>Thành Tiền</th>
+                <th>Xóa</th>
+            </tr>
+            </thead>
+            <tbody id="bang-nhap-tam">
+            </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+            <div style="font-size: 22px; font-weight: bold; color: #e74c3c;">Tổng Tiền: <span id="lblTongTienNhap">0 đ</span></div>
+            <button class="btn-save" onclick="luuHoaDonMoi()" style="background-color: #e67e22; width: auto; padding: 12px 30px;">XÁC NHẬN NHẬP KHO</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function dangXuatAdmin() {
+        if(confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Quản trị?")) {
+            window.location.href = 'dang-nhap.html';
+        }
+    }
+
+    // ==========================================
+    // 1. DATA KHO 56 CUỐN SÁCH (TỪ BẠN CUNG CẤP)
+    // ==========================================
+    const bookDatabase = {
+        "ba-tuoc-monte-cristo": { id: "ba-tuoc-monte-cristo", title: "Bá tước Monte Cristo", price: 185000, category: "Văn học" },
+        "giet-con-chim-nhai": { id: "giet-con-chim-nhai", title: "Giết con chim nhại", price: 210000, category: "Văn học" },
+        "hai-so-phan": { id: "hai-so-phan", title: "Hai số phận", price: 320000, category: "Văn học" },
+        "khong-gia-dinh": { id: "khong-gia-dinh", title: "Không gia đình", price: 450000, category: "Văn học" },
+        "phia-sau-nghi-can-x": { id: "phia-sau-nghi-can-x", title: "Phía sau nghi can X", price: 230000, category: "Trinh thám" },
+        "rung-nauy": { id: "rung-nauy", title: "Rừng Nauy", price: 240000, category: "Văn học" },
+        "bo-gia": { id: "bo-gia", title: "Bố Già", price: 105000, category: "Văn học" },
+        "nhung-nguoi-khon-kho": { id: "nhung-nguoi-khon-kho", title: "Những người khốn khổ", price: 285000, category: "Văn học" },
+        "phia-tay-khong-co-gi-la": { id: "phia-tay-khong-co-gi-la", title: "Phía tây không có gì lạ", price: 50000, category: "Văn học" },
+        "tuoi-tre-dang-gia-bao-nhieu": { id: "tuoi-tre-dang-gia-bao-nhieu", title: "Tuổi trẻ đáng giá bao nhiêu", price: 80000, category: "Kỹ năng" },
+        "cay-cam-ngot-cua-toi": { id: "cay-cam-ngot-cua-toi", title: "Cây Cam Ngọt Của Tôi", price: 81000, category: "Văn học" },
+        "khong-diet-khong-sinh-dung-so-hai": { id: "khong-diet-khong-sinh-dung-so-hai", title: "Không Diệt Không Sinh Đừng Sợ Hãi", price: 82500, category: "Kỹ năng" },
+        "khi-hoi-tho-hoa-thinh-khong": { id: "khi-hoi-tho-hoa-thinh-khong", title: "Khi Hơi Thở Hóa Thinh Không", price: 81750, category: "Văn học" },
+        "dan-ong-sao-hoa-dan-ba-sao-kim": { id: "dan-ong-sao-hoa-dan-ba-sao-kim", title: "Đàn Ông Sao Hỏa Đàn Bà Sao Kim", price: 122000, category: "Kỹ năng" },
+        "muon-kiep-nhan-sinh": { id: "muon-kiep-nhan-sinh", title: "Muôn Kiếp Nhân Sinh", price: 117600, category: "Văn học" },
+        "tieng-han-tong-hop-so-cap-1": { id: "tieng-han-tong-hop-so-cap-1", title: "Tiếng Hàn Tổng Hợp - Sơ Cấp 1", price: 148500, category: "Ngoại ngữ" },
+        "dac-nhan-tam": { id: "dac-nhan-tam", title: "Đắc Nhân Tâm", price: 56000, category: "Kỹ năng" },
+        "day-con-lam-giau-01": { id: "day-con-lam-giau-01", title: "Dạy Con Làm Giàu 01", price: 62000, category: "Kinh tế" },
+        "hieu-ve-trai-tim": { id: "hieu-ve-trai-tim", title: "Hiểu Về Trái Tim", price: 119000, category: "Kỹ năng" },
+        "ngon-ngu-co-the": { id: "ngon-ngu-co-the", title: "Ngôn Ngữ Cơ Thể", price: 158000, category: "Kỹ năng" },
+        "cam-on-nguoi-lon": { id: "cam-on-nguoi-lon", title: "Cảm Ơn Người Lớn", price: 84700, category: "Văn học" },
+        "thay-doi-cuoc-song-voi-nhan-so-hoc": { id: "thay-doi-cuoc-song-voi-nhan-so-hoc", title: "Thay Đổi Cuộc Sống Với Nhân Số Học", price: 173600, category: "Kỹ năng" },
+        "khoi-nghiep-ban-le": { id: "khoi-nghiep-ban-le", title: "Khởi Nghiệp Bán Lẻ", price: 125000, category: "Kinh tế" },
+        "muon-kiep-nhan-sinh-tap-2": { id: "muon-kiep-nhan-sinh-tap-2", title: "Muôn Kiếp Nhân Sinh - Tập 2", price: 187600, category: "Văn học" },
+        "lam-ban-voi-bau-troi": { id: "lam-ban-voi-bau-troi", title: "Làm Bạn Với Bầu Trời", price: 169400, category: "Văn học" },
+        "tam-ly-hoc-toi-pham": { id: "tam-ly-hoc-toi-pham", title: "Tâm Lý Học Tội Phạm", price: 94000, category: "Tâm lý" },
+        "thien-tai-ben-trai-ke-dien-ben-phai": { id: "thien-tai-ben-trai-ke-dien-ben-phai", title: "Thiên Tài Bên Trái, Kẻ Điên Bên Phải", price: 116000, category: "Tâm lý" },
+        "tam-ly-hoc-ve-tien": { id: "tam-ly-hoc-ve-tien", title: "Tâm Lý Học Về Tiền", price: 141500, category: "Tâm lý" },
+        "cay-chuoi-non-di-giay-xanh": { id: "cay-chuoi-non-di-giay-xanh", title: "Cây Chuối Non Đi Giày Xanh", price: 84700, category: "Văn học" },
+        "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau": { id: "tu-hoc-tieng-trung-cho-nguoi-moi-bat-dau", title: "Tự Học Tiếng Trung Cho Người Mới Bắt Đầu", price: 85500, category: "Ngoại ngữ" },
+        "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat": { id: "ong-tram-tuoi-treo-qua-cua-so-va-bien-mat", title: "Ông Trăm Tuổi Trèo Qua Cửa Sổ Và Biến Mất", price: 146300, category: "Văn học" },
+        "nguoi-dua-dieu": { id: "nguoi-dua-dieu", title: "Người Đua Diều", price: 146300, category: "Văn học" },
+        "think-and-grow-rich": { id: "think-and-grow-rich", title: "Think And Grow Rich", price: 77000, category: "Kinh tế" },
+        "nguoi-giau-co-nhat-thanh-babylon": { id: "nguoi-giau-co-nhat-thanh-babylon", title: "Người Giàu Có Nhất Thành Babylon", price: 74000, category: "Kinh tế" },
+        "lam-giau-tu-chung-khoan": { id: "lam-giau-tu-chung-khoan", title: "Làm Giàu Từ Chứng Khoán", price: 700000, category: "Kinh tế" },
+        "ghi-chep-phap-y-nhung-cai-chet-bi-an": { id: "ghi-chep-phap-y-nhung-cai-chet-bi-an", title: "Ghi Chép Pháp Y - Những Cái Chết Bí Ẩn", price: 112500, category: "Trinh thám" },
+        "kheo-an-noi-se-co-duoc-thien-ha": { id: "kheo-an-noi-se-co-duoc-thien-ha", title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ", price: 118000, category: "Tâm lý" },
+        "nha-gia-kim": { id: "nha-gia-kim", title: "Nhà giả kim", price: 100000, category: "Văn học" },
+        "90-tre-thong-minh-nho-tro-chuyen": { id: "90-tre-thong-minh-nho-tro-chuyen", title: "90% Trẻ Thông Minh Nhờ Trò Chuyện", price: 33000, category: "Kỹ năng" },
+        "bi-mat-cua-phan-thien-an": { id: "bi-mat-cua-phan-thien-an", title: "Bí Mật Của Phan Thiên Ân", price: 69000, category: "Kỹ năng" },
+        "co-hai-con-meo-ngoi-ben-cua-so": { id: "co-hai-con-meo-ngoi-ben-cua-so", title: "Có Hai Con Mèo Ngồi Bên Cửa Sổ", price: 77000, category: "Văn học" },
+        "hanh-tinh-cua-mot-ke-nghi-nhieu": { id: "hanh-tinh-cua-mot-ke-nghi-nhieu", title: "Hành Tinh Của Một Kẻ Nghĩ Nhiều", price: 56000, category: "Tâm lý" },
+        "tu-dien-tieng-em": { id: "tu-dien-tieng-em", title: "Từ Điển Tiếng 'Em'", price: 55000, category: "Văn học" },
+        "di-tim-le-song": { id: "di-tim-le-song", title: "Đi Tìm Lẽ Sống", price: 62000, category: "Tâm lý" },
+        "cho-toi-xin-mot-ve-di-tuoi-tho": { id: "cho-toi-xin-mot-ve-di-tuoi-tho", title: "Cho Tôi Xin Một Vé Đi Tuổi Thơ", price: 69300, category: "Văn học" },
+        "bien-moi-thu-thanh-tien": { id: "bien-moi-thu-thanh-tien", title: "Biến Mọi Thứ Thành Tiền", price: 109000, category: "Kinh tế" },
+        "combo-sach-english": { id: "combo-sach-english", title: "Combo sách English", price: 85500, category: "Ngoại ngữ" },
+        "lam-giau-tu-chung-khoan-bo-2-cuon": { id: "lam-giau-tu-chung-khoan-bo-2-cuon", title: "Làm Giàu Từ Chứng Khoán (Bộ 2 cuốn)", price: 700000, category: "Kinh tế" },
+        "khong-so-cham-chi-so-dung": { id: "khong-so-cham-chi-so-dung", title: "Không Sợ Chậm Chỉ Sợ Dừng", price: 84000, category: "Kỹ năng" },
+        "vi-than-cua-nhung-quyet-dinh": { id: "vi-than-cua-nhung-quyet-dinh", title: "Vị Thần Của Những Quyết Định", price: 51000, category: "Kỹ năng" },
+        "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban": { id: "tho-bay-mau-va-nhung-nguoi-nghi-no-la-ban", title: "Thỏ Bảy Màu Và Những Người Nghĩ Nó Là Bạn", price: 79000, category: "Văn học" },
+        "muon-kiep-nhan-sinh-tap-3": { id: "muon-kiep-nhan-sinh-tap-3", title: "Muôn Kiếp Nhân Sinh - Tập 3", price: 152600, category: "Văn học" },
+        "to-binh-yen-ve-hanh-phuc": { id: "to-binh-yen-ve-hanh-phuc", title: "Tô Bình Yên Vẽ Hạnh Phúc", price: 70000, category: "Kỹ năng" },
+        "thuat-thao-tung": { id: "thuat-thao-tung", title: "Thuật Thao Túng", price: 89600, category: "Kỹ năng" },
+        "khong-phai-soi-nhung-cung-dung-la-cuu": { id: "khong-phai-soi-nhung-cung-dung-la-cuu", title: "Không Phải Sói Nhưng Cũng Đừng Là Cừu", price: 92000, category: "Văn học" },
+        "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong": { id: "noi-chuyen-la-ban-nang-giu-mieng-la-tu-duong", title: "Nói Chuyện Là Bản Năng, Giữ Miệng Là Tu Dưỡng", price: 123000, category: "Kỹ năng" }
+    };
+    const dsSach = Object.values(bookDatabase);
+
+    // ==========================================
+    // 2. KHAI BÁO NHÀ PHÂN PHỐI & RANDOM SỐ LƯỢNG NHẬP
+    // ==========================================
+    const duLieuNCCGoc = [
+        { id: "NCC-001", name: "Nhà sách Fahasa", phone: "1900 636467", email: "info@fahasa.com", totalPaid: 0, status: "Đang hợp tác" },
+        { id: "NCC-002", name: "Công ty Nhã Nam", phone: "0243 514 6876", email: "nhanam@nhanam.vn", totalPaid: 0, status: "Đang hợp tác" },
+        { id: "NCC-003", name: "Alphabooks", phone: "0243 722 6234", email: "info@alphabooks.vn", totalPaid: 0, status: "Đang hợp tác" },
+        { id: "NCC-004", name: "Tiki Trading", phone: "1900 6035", email: "hotro@tiki.vn", totalPaid: 0, status: "Đang hợp tác" }
+    ];
+
+    const duLieuHoaDonGoc = [];
+
+    duLieuNCCGoc.forEach(ncc => {
+        let sachCuaNCC = [];
+        if(ncc.id === "NCC-001") sachCuaNCC = dsSach.filter(s => s.category === "Văn học");
+        else if(ncc.id === "NCC-002") sachCuaNCC = dsSach.filter(s => s.category === "Kỹ năng");
+        else if(ncc.id === "NCC-003") sachCuaNCC = dsSach.filter(s => s.category === "Kinh tế");
+        else if(ncc.id === "NCC-004") sachCuaNCC = dsSach.filter(s => ["Tâm lý", "Trinh thám", "Ngoại ngữ"].includes(s.category));
+
+        if(sachCuaNCC.length > 0) {
+            let tongTienHD = 0;
+            let itemsHD = [];
+
+            sachCuaNCC.forEach(s => {
+                // TẠO RANDOM SỐ LƯỢNG NHẬP TỪ 10 ĐẾN 60 CUỐN CHO MỖI LOẠI
+                let sl = Math.floor(Math.random() * 51) + 10;
+                let thanhTien = s.price * sl;
+                tongTienHD += thanhTien;
+                itemsHD.push({
+                    bookId: s.id, title: s.title, price: s.price, quantity: sl, total: thanhTien
+                });
+            });
+
+            ncc.totalPaid = tongTienHD;
+            duLieuHoaDonGoc.push({
+                id: "HD-" + Math.floor(Math.random() * 10000),
+                supplierId: ncc.id,
+                date: "2026-04-15", // Ngày lập hóa đơn
+                amount: tongTienHD,
+                items: itemsHD
+            });
+        }
+    });
+
+    // ÉP TRÌNH DUYỆT TẢI LẠI DỮ LIỆU ĐỂ THẤY SỐ RANDOM MỚI (Version 7)
+    if (!localStorage.getItem('da_cap_nhat_du_lieu_ncc_v7')) {
+        localStorage.removeItem('admin_ncc_list');
+        localStorage.removeItem('admin_invoices');
+        localStorage.setItem('da_cap_nhat_du_lieu_ncc_v7', 'true');
+    }
+
+    let danhSachNCC = JSON.parse(localStorage.getItem('admin_ncc_list')) || duLieuNCCGoc;
+    let danhSachHoaDon = JSON.parse(localStorage.getItem('admin_invoices')) || duLieuHoaDonGoc;
+
+    localStorage.setItem('admin_ncc_list', JSON.stringify(danhSachNCC));
+    localStorage.setItem('admin_invoices', JSON.stringify(danhSachHoaDon));
+
+    let currentSupplierId = "";
+    let currentSupplierName = "";
+    let gioHangTam = [];
+
+    // ==========================================
+    // LOGIC BẢNG NHÀ CUNG CẤP CHÍNH
+    // ==========================================
+    function xoaDau(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
+
+    function hienThiDuLieuNCC() {
+        const tbody = document.getElementById('bang-nha-cung-cap');
+        let tongNCC = 0; let tongTienChi = 0; let htmlRows = '';
+
+        let tuKhoaGoc = document.getElementById('txtTimKiemNCC') ? document.getElementById('txtTimKiemNCC').value.trim().toLowerCase() : "";
+        let tuKhoaKhongDau = xoaDau(tuKhoaGoc);
+        let nguoiDungGoCoDau = (tuKhoaGoc !== tuKhoaKhongDau);
+
+        danhSachNCC.forEach((ncc, index) => {
+            let isMatch = false;
+            if (tuKhoaGoc === "") isMatch = true;
+            else if (nguoiDungGoCoDau) isMatch = ncc.name.toLowerCase().includes(tuKhoaGoc) || ncc.id.toLowerCase().includes(tuKhoaGoc);
+            else isMatch = xoaDau(ncc.name).includes(tuKhoaKhongDau) || xoaDau(ncc.id).includes(tuKhoaKhongDau);
+
+            if (isMatch) {
+                tongNCC++; tongTienChi += Number(ncc.totalPaid);
+                let statusClass = ncc.status === "Đang hợp tác" ? "status-active" : "status-pause";
+
+                htmlRows += `
+                    <tr>
+                        <td><strong>${ncc.id}</strong></td>
+                        <td style="font-weight: bold; color: #2980b9;">${ncc.name}</td>
+                        <td>${ncc.phone}</td>
+                        <td>${ncc.email}</td>
+                        <td style="color: #e74c3c; font-weight: bold;">${Number(ncc.totalPaid).toLocaleString('vi-VN')} đ</td>
+                        <td><span class="status-badge ${statusClass}">${ncc.status}</span></td>
+                        <td style="text-align: center; min-width: 180px;">
+                            <button class="btn-action btn-view" onclick="moXemHoaDon('${ncc.id}', '${ncc.name}')">📑 Hóa Đơn</button>
+                            <button class="btn-action btn-edit" onclick="moFormSua(${index})">Sửa</button>
+                            <button class="btn-action btn-delete" onclick="xoaNCC(${index})">Xóa</button>
+                        </td>
+                    </tr>`;
+            }
+        });
+
+        tbody.innerHTML = htmlRows || `<tr><td colspan="7" style="text-align: center; padding: 25px;">Không tìm thấy kết quả.</td></tr>`;
+        document.getElementById('tong-ncc').innerText = tongNCC;
+        document.getElementById('tong-tien-chi').innerText = tongTienChi.toLocaleString('vi-VN') + " đ";
+    }
+
+    function xoaNCC(index) {
+        if (danhSachNCC[index].totalPaid > 0) return alert(`LỖI: Không thể xóa đối tác "${danhSachNCC[index].name}" vì đã có lịch sử giao dịch trên hệ thống.\n\n💡 Gợi ý: Nếu muốn ngừng hợp tác, vui lòng ấn "Sửa" và chuyển trạng thái sang "Tạm dừng" để bảo toàn dữ liệu kế toán!`);
+
+        let loiCanhBao = `LƯU Ý: Chức năng này chỉ dành cho việc xóa khi thêm nhầm đối tác.\n\nBạn có chắc chắn muốn xóa vĩnh viễn "${danhSachNCC[index].name}" không?`;
+        if(confirm(loiCanhBao)) {
+            danhSachNCC.splice(index, 1);
+            localStorage.setItem('admin_ncc_list', JSON.stringify(danhSachNCC));
+            hienThiDuLieuNCC();
+        }
+    }
+
+    // ==========================================
+    // LOGIC HÓA ĐƠN & CHI TIẾT
+    // ==========================================
+    function moXemHoaDon(nccId, nccName) {
+        currentSupplierId = nccId; currentSupplierName = nccName;
+        document.getElementById('hdModalTitle').innerText = `Danh Sách Hóa Đơn - ${nccName}`;
+
+        let hoaDonCuaNCC = danhSachHoaDon.filter(hd => hd.supplierId === nccId);
+        let html = '';
+
+        if (hoaDonCuaNCC.length === 0) {
+            html = `<tr><td colspan="5" style="text-align: center;">Chưa có giao dịch.</td></tr>`;
+        } else {
+            hoaDonCuaNCC.sort((a,b) => new Date(b.date) - new Date(a.date));
+            hoaDonCuaNCC.forEach(hd => {
+                let soDauSach = hd.items ? hd.items.length : 0;
+                html += `
+                    <tr>
+                        <td><strong>${hd.id}</strong></td>
+                        <td>${hd.date}</td>
+                        <td>${soDauSach} loại sách</td>
+                        <td style="color: #e74c3c; font-weight: bold;">${Number(hd.amount).toLocaleString('vi-VN')} đ</td>
+                        <td style="text-align: center;">
+                            <button class="btn-action btn-detail" onclick="moChiTietHD('${hd.id}')">👁️ Xem chi tiết</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+        document.getElementById('bang-hoa-don').innerHTML = html;
+        document.getElementById('hoaDonModal').style.display = 'flex';
+    }
+
+    function moChiTietHD(hdId) {
+        let hd = danhSachHoaDon.find(h => h.id === hdId);
+        if(!hd) return;
+
+        document.getElementById('chiTietTitle').innerText = `Chi tiết Hóa Đơn: ${hd.id}`;
+        let html = '';
+        if(hd.items && hd.items.length > 0) {
+            hd.items.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.bookId}</td>
+                        <td style="font-weight: bold;">${item.title}</td>
+                        <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
+                        <td>${item.quantity}</td>
+                        <td style="color: #e74c3c; font-weight: bold;">${Number(item.total).toLocaleString('vi-VN')} đ</td>
+                    </tr>`;
+            });
+        }
+        document.getElementById('bang-chi-tiet-hd').innerHTML = html;
+        document.getElementById('chiTietTotal').innerText = `Tổng cộng: ${Number(hd.amount).toLocaleString('vi-VN')} đ`;
+        document.getElementById('chiTietHDModal').style.display = 'flex';
+    }
+
+    // ==========================================
+    // LOGIC TẠO HÓA ĐƠN NHẬP KHO MỚI
+    // ==========================================
+    function moFormNhapHang() {
+        document.getElementById('txtNgayNhap').valueAsDate = new Date();
+        gioHangTam = [];
+        renderLuoiNhapHang();
+
+        let sel = document.getElementById('selSachNhap');
+        let sachCuaNCCNay = [];
+        if(currentSupplierId === "NCC-001") sachCuaNCCNay = dsSach.filter(s => s.category === "Văn học");
+        else if(currentSupplierId === "NCC-002") sachCuaNCCNay = dsSach.filter(s => s.category === "Kỹ năng");
+        else if(currentSupplierId === "NCC-003") sachCuaNCCNay = dsSach.filter(s => s.category === "Kinh tế");
+        else sachCuaNCCNay = dsSach;
+
+        sel.innerHTML = sachCuaNCCNay.map(s => `<option value="${s.id}">${s.title} (${Number(s.price).toLocaleString('vi-VN')}đ)</option>`).join("");
+
+        document.getElementById('nhapHangModal').style.display = 'flex';
+    }
+
+    function themSachVaoLuoi() {
+        let sel = document.getElementById('selSachNhap');
+        let bookId = sel.value;
+        let qty = parseInt(document.getElementById('txtSoLuongNhap').value);
+        if(!bookId || qty <= 0) return alert("Số lượng không hợp lệ!");
+
+        let book = dsSach.find(s => s.id === bookId);
+
+        let exist = gioHangTam.find(i => i.bookId === bookId);
+        if(exist) {
+            exist.quantity += qty;
+            exist.total = exist.quantity * exist.price;
+        } else {
+            gioHangTam.push({ bookId: book.id, title: book.title, price: book.price, quantity: qty, total: book.price * qty });
+        }
+        renderLuoiNhapHang();
+    }
+
+    function xoaSachKhoiLuoi(index) {
+        gioHangTam.splice(index, 1);
+        renderLuoiNhapHang();
+    }
+
+    function renderLuoiNhapHang() {
+        let html = '';
+        let tongTien = 0;
+        gioHangTam.forEach((item, index) => {
+            tongTien += item.total;
+            html += `
+                <tr>
+                    <td style="font-weight:bold;">${item.title}</td>
+                    <td>${Number(item.price).toLocaleString('vi-VN')} đ</td>
+                    <td>${item.quantity}</td>
+                    <td style="color:#e74c3c; font-weight:bold;">${Number(item.total).toLocaleString('vi-VN')} đ</td>
+                    <td><button onclick="xoaSachKhoiLuoi(${index})" class="btn-action btn-delete">X</button></td>
+                </tr>`;
+        });
+        document.getElementById('bang-nhap-tam').innerHTML = html;
+        document.getElementById('lblTongTienNhap').innerText = tongTien.toLocaleString('vi-VN') + " đ";
+    }
+
+    function luuHoaDonMoi() {
+        if(gioHangTam.length === 0) return alert("Vui lòng chọn ít nhất 1 cuốn sách để nhập!");
+
+        let ngayNhap = document.getElementById('txtNgayNhap').value;
+        let tongTien = gioHangTam.reduce((sum, item) => sum + item.total, 0);
+        let randomID = "HD-" + Math.floor(Math.random() * 10000);
+
+        let newHoaDon = { id: randomID, supplierId: currentSupplierId, date: ngayNhap, amount: tongTien, items: [...gioHangTam] };
+
+        danhSachHoaDon.push(newHoaDon);
+        localStorage.setItem('admin_invoices', JSON.stringify(danhSachHoaDon));
+
+        let nccObj = danhSachNCC.find(ncc => ncc.id === currentSupplierId);
+        if (nccObj) {
+            nccObj.totalPaid += tongTien;
+            localStorage.setItem('admin_ncc_list', JSON.stringify(danhSachNCC));
+        }
+
+        alert(`Nhập kho thành công!\nĐã tạo Hóa Đơn: ${randomID}`);
+        dongModal('nhapHangModal');
+        hienThiDuLieuNCC();
+        moXemHoaDon(currentSupplierId, currentSupplierName);
+    }
+
+    // ==========================================
+    // LOGIC FORM THÊM / SỬA NCC
+    // ==========================================
+    function dongModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+    function moFormThem() {
+        document.getElementById('modalTitle').innerText = "Thêm Đối Tác Mới";
+        document.getElementById('editIndex').value = "";
+        document.getElementById('txtMaNCC').value = ""; document.getElementById('txtMaNCC').readOnly = false;
+        document.getElementById('txtTenNCC').value = ""; document.getElementById('txtSDT').value = ""; document.getElementById('txtEmail').value = "";
+        document.getElementById('nccModal').style.display = 'flex';
+    }
+
+    function moFormSua(index) {
+        document.getElementById('modalTitle').innerText = "Cập nhật Thông tin";
+        document.getElementById('editIndex').value = index;
+        let ncc = danhSachNCC[index];
+        document.getElementById('txtMaNCC').value = ncc.id; document.getElementById('txtMaNCC').readOnly = true;
+        document.getElementById('txtTenNCC').value = ncc.name; document.getElementById('txtSDT').value = ncc.phone; document.getElementById('txtEmail').value = ncc.email;
+        document.getElementById('selTrangThai').value = ncc.status;
+        document.getElementById('nccModal').style.display = 'flex';
+    }
+
+    function luuNCC() {
+        let maNCC = document.getElementById('txtMaNCC').value.trim();
+        let tenNCC = document.getElementById('txtTenNCC').value.trim();
+        let indexSua = document.getElementById('editIndex').value;
+
+        if (!maNCC || !tenNCC) return alert("Vui lòng nhập Mã và Tên!");
+
+        if (indexSua === "") {
+            if(danhSachNCC.find(item => item.id === maNCC)) return alert("Mã đã tồn tại!");
+            danhSachNCC.push({ id: maNCC, name: tenNCC, phone: document.getElementById('txtSDT').value, email: document.getElementById('txtEmail').value, totalPaid: 0, status: document.getElementById('selTrangThai').value });
+        } else {
+            danhSachNCC[indexSua].name = tenNCC; danhSachNCC[indexSua].phone = document.getElementById('txtSDT').value; danhSachNCC[indexSua].email = document.getElementById('txtEmail').value; danhSachNCC[indexSua].status = document.getElementById('selTrangThai').value;
+        }
+
+        localStorage.setItem('admin_ncc_list', JSON.stringify(danhSachNCC));
+        dongModal('nccModal'); hienThiDuLieuNCC();
+    }
+
+    document.addEventListener('DOMContentLoaded', hienThiDuLieuNCC);
+</script>
+</body>
+</html>
