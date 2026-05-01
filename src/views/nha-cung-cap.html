@@ -150,7 +150,7 @@
             <tr>
                 <th>Mã Sách</th>
                 <th>Tên Sách</th>
-                <th>Đơn Giá</th>
+                <th>Đơn Giá Nhập</th>
                 <th>Số Lượng</th>
                 <th>Thành Tiền</th>
             </tr>
@@ -192,7 +192,7 @@
             <thead>
             <tr>
                 <th>Tên Sách</th>
-                <th>Đơn Giá</th>
+                <th>Đơn Giá Nhập</th>
                 <th>SL</th>
                 <th>Thành Tiền</th>
                 <th>Xóa</th>
@@ -280,7 +280,7 @@
     const dsSach = Object.values(bookDatabase);
 
     // ==========================================
-    // 2. KHAI BÁO NHÀ PHÂN PHỐI & RANDOM SỐ LƯỢNG NHẬP
+    // 2. KHAI BÁO NHÀ PHÂN PHỐI & TÍNH CHIẾT KHẤU 35%
     // ==========================================
     const duLieuNCCGoc = [
         { id: "NCC-001", name: "Nhà sách Fahasa", phone: "1900 636467", email: "info@fahasa.com", totalPaid: 0, status: "Đang hợp tác" },
@@ -304,10 +304,11 @@
 
             sachCuaNCC.forEach(s => {
                 let sl = Math.floor(Math.random() * 51) + 10;
-                let thanhTien = s.price * sl;
+                let giaNhap = s.price * 0.65; // Giảm 35%
+                let thanhTien = giaNhap * sl;
                 tongTienHD += thanhTien;
                 itemsHD.push({
-                    bookId: s.id, title: s.title, price: s.price, quantity: sl, total: thanhTien
+                    bookId: s.id, title: s.title, price: giaNhap, quantity: sl, total: thanhTien
                 });
             });
 
@@ -315,17 +316,17 @@
             duLieuHoaDonGoc.push({
                 id: "HD-" + Math.floor(Math.random() * 10000),
                 supplierId: ncc.id,
-                date: "2026-04-15", // Ngày lập hóa đơn
+                date: "2026-04-15",
                 amount: tongTienHD,
                 items: itemsHD
             });
         }
     });
 
-    if (!localStorage.getItem('da_cap_nhat_du_lieu_ncc_v7')) {
+    if (!localStorage.getItem('da_cap_nhat_du_lieu_ncc_v8')) {
         localStorage.removeItem('admin_ncc_list');
         localStorage.removeItem('admin_invoices');
-        localStorage.setItem('da_cap_nhat_du_lieu_ncc_v7', 'true');
+        localStorage.setItem('da_cap_nhat_du_lieu_ncc_v8', 'true');
     }
 
     let danhSachNCC = JSON.parse(localStorage.getItem('admin_ncc_list')) || duLieuNCCGoc;
@@ -464,7 +465,11 @@
         else if(currentSupplierId === "NCC-003") sachCuaNCCNay = dsSach.filter(s => s.category === "Kinh tế");
         else sachCuaNCCNay = dsSach;
 
-        sel.innerHTML = sachCuaNCCNay.map(s => `<option value="${s.id}">${s.title} (${Number(s.price).toLocaleString('vi-VN')}đ)</option>`).join("");
+        // HIỂN THỊ CẢ GIÁ BÁN VÀ GIÁ ĐÃ CHIẾT KHẤU 35% ĐỂ ADMIN BIẾT
+        sel.innerHTML = sachCuaNCCNay.map(s => {
+            let giaNhap = s.price * 0.65;
+            return `<option value="${s.id}">${s.title} (Bán: ${Number(s.price).toLocaleString('vi-VN')} ➡️ Nhập: ${Number(giaNhap).toLocaleString('vi-VN')}đ)</option>`;
+        }).join("");
 
         document.getElementById('nhapHangModal').style.display = 'flex';
     }
@@ -476,13 +481,14 @@
         if(!bookId || qty <= 0) return alert("Số lượng không hợp lệ!");
 
         let book = dsSach.find(s => s.id === bookId);
+        let giaNhap = book.price * 0.65; // Giảm 35% khi thêm vào lưới
 
         let exist = gioHangTam.find(i => i.bookId === bookId);
         if(exist) {
             exist.quantity += qty;
-            exist.total = exist.quantity * exist.price;
+            exist.total = exist.quantity * giaNhap;
         } else {
-            gioHangTam.push({ bookId: book.id, title: book.title, price: book.price, quantity: qty, total: book.price * qty });
+            gioHangTam.push({ bookId: book.id, title: book.title, price: giaNhap, quantity: qty, total: giaNhap * qty });
         }
         renderLuoiNhapHang();
     }
