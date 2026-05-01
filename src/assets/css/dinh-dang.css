@@ -968,3 +968,76 @@ nav a:hover {
     margin-bottom: 15px !important; /* Nới rộng ra thành 15px (hoặc ông có thể tăng lên 20px tùy mắt) */
 }
 
+/* =========================================
+   CSS DÀNH RIÊNG CHO GIAO DIỆN ADMIN
+   ========================================= */
+body { display: flex; background-color: #f4f7f6; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+/* THANH MENU BÊN TRÁI */
+.sidebar { width: 280px; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); color: white; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); overflow-y: auto; }
+.sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+.sidebar-header h2 { margin: 0; color: #f39c12; font-family: 'Lobster', cursive; font-size: 28px; letter-spacing: 2px; }
+.sidebar-header p { margin: 5px 0 0 0; font-size: 12px; color: #bdc3c7; text-transform: uppercase; }
+
+.admin-menu { list-style: none; padding: 0 15px; margin: 0; }
+.admin-menu li { margin-bottom: 8px; }
+.admin-menu a { display: flex; align-items: center; padding: 15px 20px; color: #ecf0f1; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: 8px; transition: all 0.3s ease; }
+.admin-menu a:hover, .admin-menu a.active { background-color: #f39c12; color: #fff; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); transform: translateX(5px); }
+.admin-menu i { margin-right: 15px; font-size: 18px; }
+.logout-btn { margin-top: 50px; background-color: rgba(231, 76, 60, 0.2) !important; color: #e74c3c !important; border: 1px solid rgba(231, 76, 60, 0.5); }
+.logout-btn:hover { background-color: #e74c3c !important; color: #fff !important; }
+
+/* KHU VỰC NỘI DUNG CHÍNH */
+.main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.page-header h1 { margin: 0; color: #2c3e50; font-size: 24px; }
+
+/* THỐNG KÊ */
+.card-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+.stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid #3498db; display: flex; flex-direction: column; justify-content: center; }
+.stat-card:nth-child(2) { border-color: #e74c3c; }
+.stat-card h3 { margin: 0 0 10px 0; color: #7f8c8d; font-size: 16px; text-transform: uppercase; }
+.stat-card .value { font-size: 36px; font-weight: bold; color: #2c3e50; }
+
+/* BẢNG DỮ LIỆU */
+.table-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.data-table th { background-color: #f8f9fa; color: #2c3e50; padding: 15px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+.data-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #34495e; vertical-align: middle; }
+.data-table tr:hover { background-color: #fdfdfd; }
+
+.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+.status-active { background: #d1fae5; color: #065f46; }
+.status-pause { background: #fef3c7; color: #92400e; }
+
+/* NÚT THAO TÁC */
+.btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin-right: 5px; margin-bottom: 5px;}
+.btn-view { background-color: #9b59b6; color: white; }
+.btn-view:hover { background-color: #8e44ad; }
+.btn-detail { background-color: #f39c12; color: white; }
+.btn-detail:hover { background-color: #d68910; }
+.btn-edit { background-color: #3498db; color: white; }
+.btn-edit:hover { background-color: #2980b9; }
+.btn-delete { background-color: #e74c3c; color: white; margin-right: 0;}
+.btn-delete:hover { background-color: #c0392b; }
+
+/* MODAL CHUNG */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+.modal-content { background: white; padding: 30px; border-radius: 12px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
+.modal-md { width: 450px; max-width: 90%; }
+.modal-lg { width: 850px; max-width: 95%; }
+
+.close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: 0.2s; }
+.close:hover { color: #334155; }
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; }
+.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; outline: none; }
+.form-group input:focus { border-color: #3498db; }
+.btn-save { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+.btn-save:hover { background: #219150; }
+
+.search-input-box { padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 280px; font-family: inherit; transition: 0.3s; }
+.search-input-box:focus { border-color: #f39c12; box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
+
+/* LƯỚI NHẬP HÀNG */
+.import-grid { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 20px;}
