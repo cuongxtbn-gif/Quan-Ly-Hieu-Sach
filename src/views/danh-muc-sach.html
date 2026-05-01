@@ -122,7 +122,15 @@
     };
 
 // Chuyển thành dạng mảng
-    const danhSachTimKiem = Object.values(bookDatabase);
+    // --- BẮT ĐẦU ĐỒNG BỘ DỮ LIỆU VỚI ADMIN ---
+    // 1. Nếu kho Admin (localStorage) chưa có gì, thì lấy cục bookDatabase nạp vào làm vốn ban đầu
+    if (!localStorage.getItem('adc_books_db')) {
+        localStorage.setItem('adc_books_db', JSON.stringify(Object.values(bookDatabase)));
+    }
+
+    // 2. Từ giờ trở đi, danh sách sách bán ra sẽ đọc trực tiếp từ kho của Admin
+    const danhSachTimKiem = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+    // --- KẾT THÚC ĐỒNG BỘ ---
 
     // 2. BIẾN CẤU HÌNH & QUẢN LÝ
     const soSachMoiTrang = 16;

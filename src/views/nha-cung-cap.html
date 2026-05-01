@@ -1,11 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>Hệ thống Quản trị - BOOKSTORE</title>
-    <!-- Trỏ tới các file CSS -->
+
+    <!-- Gọi file CSS chung của toàn web -->
     <link rel="stylesheet" href="../assets/css/dinh-dang.css">
-    <link rel="stylesheet" href="../assets/css/admin.css"> <!-- Đã tách giao diện sang file này -->
+
+    <!-- Gọi đúng file chứa giao diện Admin (Sidebar, bảng...) mà bạn đã tách -->
+    <link rel="stylesheet" href="../assets/css/dinh-dang-quan-ly-sach.css">
+
+    <!-- Nếu bạn có file riêng cho trang Nhà cung cấp thì gọi thêm ở đây -->
+    <link rel="stylesheet" href="../assets/css/nha-cung-cap.css">
 </head>
 <body>
 
@@ -509,7 +516,6 @@
         document.getElementById('bang-nhap-tam').innerHTML = html;
         document.getElementById('lblTongTienNhap').innerText = tongTien.toLocaleString('vi-VN') + " đ";
     }
-
     function luuHoaDonMoi() {
         if(gioHangTam.length === 0) return alert("Vui lòng chọn ít nhất 1 cuốn sách để nhập!");
 
@@ -517,6 +523,26 @@
         let tongTien = gioHangTam.reduce((sum, item) => sum + item.total, 0);
         let randomID = "HD-" + Math.floor(Math.random() * 10000);
 
+        // --- ĐOẠN MỚI THÊM: CẬP NHẬT SỐ LƯỢNG VÀO KHO (adc_books_db) ---
+        // 1. Lấy dữ liệu kho sách từ trang Quản lý sách ra
+        let khoSach = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+
+        // 2. Duyệt qua danh sách sách vừa chọn nhập về
+        gioHangTam.forEach(itemNhap => {
+            // Tìm quyển sách trong kho có ID khớp với ID sách đang nhập
+            let sachTrongKho = khoSach.find(s => s.id === itemNhap.bookId);
+
+            if (sachTrongKho) {
+                // Cộng dồn số lượng: Số lượng cũ + Số lượng mới nhập
+                sachTrongKho.stock = (Number(sachTrongKho.stock) || 0) + Number(itemNhap.quantity);
+            }
+        });
+
+        // 3. Lưu lại kho sách mới đã cập nhật số lượng
+        localStorage.setItem('adc_books_db', JSON.stringify(khoSach));
+        // --- KẾT THÚC ĐOẠN MỚI THÊM ---
+
+        // Phần code lưu hóa đơn và cập nhật NCC cũ của bạn giữ nguyên bên dưới:
         let newHoaDon = { id: randomID, supplierId: currentSupplierId, date: ngayNhap, amount: tongTien, items: [...gioHangTam] };
 
         danhSachHoaDon.push(newHoaDon);
@@ -528,11 +554,12 @@
             localStorage.setItem('admin_ncc_list', JSON.stringify(danhSachNCC));
         }
 
-        alert(`Nhập kho thành công!\nĐã tạo Hóa Đơn: ${randomID}`);
+        alert(`Nhập kho thành công!\nĐã tạo Hóa Đơn: ${randomID}\nKho sách đã được tự động cập nhật số lượng.`);
         dongModal('nhapHangModal');
         hienThiDuLieuNCC();
         moXemHoaDon(currentSupplierId, currentSupplierName);
     }
+
 
     // ==========================================
     // LOGIC FORM THÊM / SỬA NCC

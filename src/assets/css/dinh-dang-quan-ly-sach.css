@@ -1,0 +1,48 @@
+/* ================= CSS CHO BẢNG SÁCH & NÚT BẤM ================= */
+.table-header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.btn-add-book { background-color: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; box-shadow: 0 4px 6px rgba(46, 204, 113, 0.2); transition: all 0.3s ease; }
+.btn-add-book:hover { background-color: #27ae60; transform: translateY(-2px); }
+
+.book-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.book-table th, .book-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+.book-table th { background-color: #f8f9fa; color: #2c3e50; font-weight: bold; }
+.book-table img { width: 50px; height: 70px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+.action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; color: white; transition: 0.2s; }
+.btn-edit { background-color: #f39c12; margin-right: 5px; }
+.btn-edit:hover { background-color: #d68910; }
+.btn-delete { background-color: #e74c3c; }
+.btn-delete:hover { background-color: #c0392b; }
+
+/* ================= CSS CHO MODAL (POPUP THÊM/SỬA SÁCH) ================= */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+.modal-box { background: white; padding: 30px; border-radius: 12px; width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; }
+.modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #7f8c8d; }
+.modal-box h2 { margin-top: 0; color: #2c3e50; margin-bottom: 20px;}
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; font-size: 14px;}
+.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
+
+.btn-save { width: 100%; padding: 12px; background: #3498db; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+.btn-save:hover { background: #2980b9; }
+
+.badge-stock { background-color: #2ecc71; color: white; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px;}
+.badge-out-stock { background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px;}
+/* Màu cho nút Khôi phục và Thùng rác */
+.btn-restore { background-color: #27ae60; margin-right: 5px; }
+.btn-restore:hover { background-color: #1e8449; }
+
+.btn-trash-view {
+    background-color: #95a5a6;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-trash-view.active { background-color: #34495e; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }

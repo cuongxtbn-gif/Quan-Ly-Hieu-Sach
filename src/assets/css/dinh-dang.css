@@ -58,86 +58,79 @@ nav a:hover {
 .search-bar input:focus {
     box-shadow: 0 0 8px rgba(243, 156, 18, 0.6); /* Tỏa hào quang màu vàng cam */
 }
+
+/* Kéo dài thanh tìm kiếm trên Header */
+.search-bar {
+    width: 450px !important;
+}
+
+#search-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
 /* =========================================================
    4. PHẦN GIỚI THIỆU LỚN (HERO BANNER)
    ========================================================= */
 .hero-banner {
-    background-color: var(--primary-color, #2c3e50); /* Màu xanh đen chuyên nghiệp */
-    color: var(--white, white); /* Chữ màu trắng */
-    padding: 60px 20px; /* Tăng padding để banner to và thoáng hơn */
+    background-color: var(--primary-color, #2c3e50);
+    color: var(--white, white);
+    padding: 60px 20px;
     text-align: center;
-    border-radius: 15px; /* Bo tròn nhẹ các góc của cả khối banner */
-    margin: 30px; /* Tạo khoảng cách 30px xung quanh banner so với các thành phần khác */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Tạo bóng đổ sâu, làm banner nổi bật hẳn lên */
-
-    /* MẸO NÂNG CAO: Thêm hiệu ứng nền vân mờ (pattern) */
+    border-radius: 15px;
+    margin: 30px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     background-image: radial-gradient(circle at 10% 20%, rgba(216, 241, 230, 0.05) 0%, rgba(233, 226, 226, 0.05) 90.1%);
 }
 
-/* Định dạng Tiêu đề chính (Khơi nguồn tri thức) */
 .hero-banner h1 {
-    /* 1. Đổi sang font Lobster - kiểu uốn lượn nhưng đậm đà, mạnh mẽ */
     font-family: 'Lobster', cursive;
-
-    /* 2. Cho cỡ chữ to hẳn lên để gây ấn tượng mạnh */
     font-size: 65px;
-
-    /* 3. Màu sắc: Dùng màu vàng cam (vàng kim) để trông sang trọng */
     color: #f1c40f;
-
-    /* 4. Hiệu ứng bóng đổ để chữ uốn lượn nổi bật trên nền xanh */
     text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
-
     margin-bottom: 10px;
-    letter-spacing: 2px; /* Khoảng cách giữa các chữ uốn lượn */
+    letter-spacing: 2px;
 }
 
-/* Định dạng dòng mô tả (Hơn 10.000 đầu sách...) */
 .hero-banner p {
     font-family: 'Dancing Script', cursive;
-    font-size: 30px; /* Nhỏ hơn tiêu đề một chút */
-    color: rgba(255, 255, 255, 0.9); /* Màu trắng hơi mờ cho thanh thoát */
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 400;
-
     white-space: nowrap;
     margin: 0 auto 40px auto;
 }
 
-/* Định dạng cái nút bấm (KHÁM PHÁ NGAY) */
 .hero-banner .btn-cta {
-    background-color: var(--accent-color, #f39c12); /* Màu vàng cam nổi bật */
-    color: var(--primary-color, #2c3e50); /* Chữ màu xanh đen đậm */
-    padding: 15px 40px; /* Nút to, dễ bấm */
+    background-color: var(--accent-color, #f39c12);
+    color: var(--primary-color, #2c3e50);
+    padding: 15px 40px;
     border: none;
-    border-radius: 30px; /* Bo tròn hoàn toàn hai đầu nút */
+    border-radius: 30px;
     font-size: 16px;
     font-weight: bold;
-    text-transform: uppercase; /* In hoa toàn bộ chữ */
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.3s ease; /* Thêm hiệu ứng mượt mà khi di chuột vào */
-    display: inline-block; /* Để nó hoạt động như một cái nút */
+    transition: all 0.3s ease;
+    display: inline-block;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* Hiệu ứng khi di chuột qua nút */
 .hero-banner .btn-cta:hover {
-    background-color: var(--white, white); /* Chuyển sang nền trắng */
-    transform: translateY(-3px); /* Nhảy lên nhẹ một chút */
-    box-shadow: 0 6px 12px rgba(243, 156, 18, 0.4); /* Bóng tỏa ra màu cam */
+    background-color: var(--white, white);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(243, 156, 18, 0.4);
 }
 
 /* =========================================================
    TRANG TRÍ KHU VỰC SÁCH MỚI (MODERN BOOK GRID)
    ========================================================= */
-
-/* 1. Căn chỉnh khung chứa tổng thể */
 .container {
     max-width: 1200px;
     margin: 60px auto;
     padding: 0 20px;
 }
 
-/* 2. Tiêu đề phần (Heading) - Đồng bộ màu với Header */
 .container h2 {
     font-size: 32px;
     color: #2c3e50;
@@ -147,38 +140,35 @@ nav a:hover {
 }
 
 .container h2 span {
-    background: #f39c12 !important; /* Đổi sang màu vàng cam cho đồng bộ */
+    background: #f39c12 !important;
     border-radius: 10px;
 }
 
-/* 3. Lưới hiển thị (Grid) - Tự động giãn cách */
 .book-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 35px; /* Khoảng cách rộng rãi nhìn sẽ sang hơn */
+    gap: 35px;
     margin-top: 40px;
 }
 
-/* 4. Thẻ sách (Card) */
 .book-card {
     background: #ffffff;
-    border-radius: 15px; /* Bo góc tròn trịa hiện đại */
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Bóng đổ cực mờ, sang trọng */
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy nhẹ */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid #f0f0f0;
     position: relative;
 }
 
 .book-card:hover {
-    transform: translateY(-12px); /* Bay lên cao hơn khi di chuột */
+    transform: translateY(-12px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     border-color: #f39c12;
 }
 
-/* 5. Xử lý ảnh sách - Thu nhỏ và đều tăm tắp */
 .book-img {
-    height: 300px; /* Cố định chiều cao cho tất cả sách */
+    height: 300px;
     overflow: hidden;
     background: #f8f9fa;
 }
@@ -188,10 +178,9 @@ nav a:hover {
 }
 
 .book-card:hover .book-img img {
-    transform: scale(1.1); /* Ảnh hơi to ra khi hover tạo cảm giác sống động */
+    transform: scale(1.1);
 }
 
-/* 6. Nội dung bên trong thẻ (Title, Price, Button) */
 .book-content {
     padding: 20px;
     text-align: left;
@@ -202,7 +191,7 @@ nav a:hover {
     font-weight: 700;
     color: #2c3e50;
     margin-bottom: 8px;
-    height: 42px; /* Cố định chiều cao 2 dòng để không bị lệch */
+    height: 42px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -216,7 +205,6 @@ nav a:hover {
     margin-bottom: 15px;
 }
 
-/* 7. Nút Mượn Ngay (Button) */
 .btn-buy {
     width: 100%;
     padding: 12px;
@@ -233,53 +221,45 @@ nav a:hover {
 }
 
 .btn-buy:hover {
-    background: #f39c12; /* Khi hover nút đổi sang màu vàng cam */
+    background: #f39c12;
     color: #2c3e50;
     box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
 }
 
-/* 6. TỪNG CUỐN SÁCH (FLEXBOX HÀNG NGANG) */
+/* =========================================================
+   TỪNG CUỐN SÁCH (FLEXBOX HÀNG NGANG)
+   ========================================================= */
 .book-list-item {
-    display: flex;             /* QUAN TRỌNG NHẤT: Xếp mọi thứ thành hàng ngang */
-    align-items: center;       /* Căn giữa theo chiều dọc */
+    display: flex;
+    align-items: center;
     padding: 15px;
-    border-bottom: 1px solid #eee; /* Đường kẻ mờ ngăn cách các cuốn sách */
+    border-bottom: 1px solid #eee;
     transition: background-color 0.2s;
 }
 
 .book-list-item:hover {
-    background-color: #f8fbff; /* Đổi màu nền xanh nhạt khi di chuột vào dòng */
+    background-color: #f8fbff;
 }
 
-/* Bỏ đường kẻ ở cuốn sách cuối cùng cho đẹp */
 .book-list-item:last-child {
     border-bottom: none;
 }
 
-/* 7. ẢNH BÌA SÁCH (Đã ép nhỏ lại) */
 .book-cover {
-    width: 60px;               /* Ảnh bé xinh theo ý ông */
+    width: 60px;
     height: 90px;
     object-fit: cover;
     border-radius: 4px;
-    margin-right: 25px;        /* Đẩy phần chữ ra xa một chút */
+    margin-right: 25px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-/* 8. PHẦN THÔNG TIN CHỮ VÀ GIÁ */
 .book-details {
-    flex-grow: 1;              /* Phình to ra chiếm hết khoảng trống để đẩy nút bấm về cuối */
+    flex-grow: 1;
     display: flex;
-    align-items: center;       /* Xếp Tên sách, Tác giả, Đánh giá, Giá tiền thành 1 hàng ngang */
-    justify-content: space-between; /* Chia đều khoảng cách giữa các thông tin */
+    align-items: center;
+    justify-content: space-between;
     padding-right: 30px;
-}
-
-.book-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #2c3e50;
-    width: 250px;              /* Cố định chiều rộng để các cột thẳng hàng nhau */
 }
 
 .book-author {
@@ -302,7 +282,6 @@ nav a:hover {
     text-align: right;
 }
 
-/* 9. NÚT THÊM VÀO GIỎ */
 .add-to-cart {
     background-color: #3498db;
     color: white;
@@ -318,11 +297,12 @@ nav a:hover {
 .add-to-cart:hover {
     background-color: #2980b9;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transform: translateY(-2px); /* Hiệu ứng nảy lên một chút */
+    transform: translateY(-2px);
 }
-/* --- Style cho trang Danh mục sách --- */
 
-/* 1. Thanh bộ lọc (Filter Bar) */
+/* =========================================================
+   TRANG DANH MỤC SÁCH
+   ========================================================= */
 .filter-bar {
     display: flex;
     gap: 30px;
@@ -354,15 +334,12 @@ nav a:hover {
     background-color: #f8fafc;
 }
 
-/* 2. Lưới sách 4 cột (Grid 4x4) */
 .book-catalog-grid {
     display: grid;
-    /* Chia làm 4 cột bằng nhau */
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px; /* Khoảng cách giữa các quyển sách */
+    gap: 30px;
 }
 
-/* 3. Phân trang (Pagination) */
 .pagination {
     margin-top: 50px;
     display: flex;
@@ -387,7 +364,6 @@ nav a:hover {
     color: white;
 }
 
-/* Responsive: Trên máy tính bảng hiện 2 cột, điện thoại hiện 1 cột */
 @media (max-width: 1024px) {
     .book-catalog-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -421,7 +397,6 @@ nav a:hover {
     color: #f39c12;
 }
 
-/* Khối chính (Ảnh & Chữ) */
 .product-detail-wrapper {
     display: flex;
     gap: 50px;
@@ -432,7 +407,6 @@ nav a:hover {
     margin-bottom: 30px;
 }
 
-/* Khối Ảnh bìa */
 .product-gallery {
     width: 35%;
     text-align: center;
@@ -444,10 +418,9 @@ nav a:hover {
     transition: transform 0.3s ease;
 }
 .product-gallery img:hover {
-    transform: scale(1.03); /* Phóng to nhẹ khi rê chuột vào ảnh */
+    transform: scale(1.03);
 }
 
-/* Khối Chữ và Giá */
 .product-info-main {
     width: 65%;
 }
@@ -460,7 +433,7 @@ nav a:hover {
 
 .product-meta {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Chia 2 cột đều nhau */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-bottom: 25px;
     font-size: 15px;
@@ -471,24 +444,22 @@ nav a:hover {
     font-weight: 600;
 }
 .product-meta .highlight-text {
-    color: #3498db; /* Màu xanh nước biển cho Nhà cung cấp */
+    color: #3498db;
 }
 
-/* Cục Hiển thị Giá tiền */
 .product-price-box {
-    background: #fdf2f2; /* Nền đỏ cực nhạt */
+    background: #fdf2f2;
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 30px;
-    border-left: 5px solid #c92127; /* Vạch đỏ bên trái */
+    border-left: 5px solid #c92127;
 }
 .current-price {
     font-size: 38px;
     font-weight: 800;
-    color: #c92127; /* Màu đỏ Fahasa */
+    color: #c92127;
 }
 
-/* Nút bấm & Số lượng */
 .purchase-actions {
     display: flex;
     flex-direction: column;
@@ -531,7 +502,7 @@ nav a:hover {
     border-radius: 10px;
     cursor: pointer;
     border: none;
-    flex: 1; /* Hai nút rộng bằng nhau */
+    flex: 1;
     transition: all 0.3s ease;
     text-transform: uppercase;
 }
@@ -554,7 +525,6 @@ nav a:hover {
     transform: translateY(-2px);
 }
 
-/* Khối Bảng thông số & Mô tả */
 .product-specs-wrapper {
     background: #ffffff;
     padding: 40px;
@@ -598,20 +568,19 @@ nav a:hover {
    ========================================================= */
 .suggestions-box {
     position: absolute;
-    top: 110%; /* Nằm ngay sát dưới thanh tìm kiếm */
+    top: 110%;
     left: 0;
     width: 100%;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Đổ bóng sâu để nổi bật */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     max-height: 400px;
-    overflow-y: auto; /* Có thanh cuộn nếu nhiều sách */
-    z-index: 9999; /* Luôn nổi lên trên cùng, không bị đè */
-    display: none; /* Mặc định giấu đi */
-    text-align: left; /* Căn lề trái cho chữ */
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+    text-align: left;
 }
 
-/* Từng thẻ gợi ý sách bên trong hộp */
 .suggestion-item {
     display: flex;
     align-items: center;
@@ -631,25 +600,28 @@ nav a:hover {
 }
 
 .suggestion-item:hover h4 {
-    color: #f39c12; /* Đổi màu chữ thành cam khi di chuột */
+    color: #f39c12;
 }
 
-/* ĐÂY LÀ ĐOẠN QUAN TRỌNG NHẤT: ÉP ẢNH NHỎ LẠI */
 .suggestion-item img {
-    width: 45px !important;      /* Ép chiều rộng nhỏ xíu */
-    height: 65px !important;     /* Ép chiều cao tương xứng */
-    object-fit: cover;           /* Cắt ảnh vuông vắn không bị méo */
+    width: 45px !important;
+    height: 65px !important;
+    object-fit: cover;
     border-radius: 4px;
     margin-right: 15px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Thông tin sách trong hộp gợi ý */
 .suggestion-item-info h4 {
     margin: 0 0 5px 0;
     font-size: 15px;
     font-weight: 600;
     line-height: 1.2;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 330px;
+    display: block;
 }
 
 .suggestion-item-info p {
@@ -658,34 +630,10 @@ nav a:hover {
     color: #e74c3c;
     font-weight: bold;
 }
-/* =========================================================
-   MỞ RỘNG THANH TÌM KIẾM CHO RỘNG RÃI
-   ========================================================= */
-/* Kéo dài thanh tìm kiếm trên Header */
-.search-bar {
-    width: 450px !important; /* Bạn có thể tăng lên 500px nếu thấy vẫn chưa đủ dài */
-}
-
-/* Đảm bảo ô nhập chữ giãn đều theo thanh tìm kiếm */
-#search-input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Ép tên sách KHÔNG BAO GIỜ được rớt dòng, nếu dài quá thì hiện dấu ... */
-.suggestion-item-info h4 {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 330px; /* Giới hạn độ dài chữ để chừa chỗ cho giá tiền */
-    display: block;
-}
 
 /* =======================================================
    CSS CHO TRANG GIỎ HÀNG VÀ THANH TOÁN
    ======================================================= */
-
-/* 1. Khung chứa chính */
 .cart-container {
     max-width: 1000px;
     margin: 30px auto;
@@ -696,7 +644,6 @@ nav a:hover {
     font-family: 'Inter', sans-serif;
 }
 
-/* 2. Bảng giỏ hàng & Theo dõi đơn */
 .cart-container table {
     width: 100%;
     border-collapse: collapse;
@@ -715,10 +662,27 @@ nav a:hover {
     padding: 15px 10px;
     text-align: center;
     vertical-align: middle;
+    border-bottom: none;
+}
+
+.cart-container tr {
     border-bottom: 1px solid #f1f5f9;
 }
 
-/* 3. Hình ảnh sản phẩm */
+.cart-container th:nth-child(2) {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.cart-container td:nth-child(2) {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 20px;
+    border-bottom: none;
+}
+
 .item-img {
     width: 60px;
     height: 80px;
@@ -729,7 +693,6 @@ nav a:hover {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* 4. Cụm nút Tăng/Giảm số lượng */
 .qty-box {
     display: inline-flex;
     align-items: center;
@@ -762,7 +725,6 @@ nav a:hover {
     font-weight: 600;
 }
 
-/* 5. Nút Xóa */
 .btn-delete {
     padding: 6px 12px;
     color: #ef4444;
@@ -778,7 +740,6 @@ nav a:hover {
     color: white;
 }
 
-/* 6. Thanh Tổng kết và Đặt hàng */
 .checkout-bar {
     display: flex;
     justify-content: space-between;
@@ -810,7 +771,6 @@ nav a:hover {
 
 .btn-checkout:hover { background: #1d4ed8; }
 
-/* 7. Trạng thái theo dõi đơn hàng */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -820,7 +780,6 @@ nav a:hover {
 .status-pending { background: #fef08a; color: #854d0e; }
 .status-approved { background: #bbf7d0; color: #166534; }
 
-/* 8. Modal (Popup) Điền thông tin giao hàng */
 .modal {
     display: none;
     position: fixed;
@@ -895,149 +854,36 @@ nav a:hover {
 }
 
 .btn-confirm:hover { background: #be123c; }
-/* =======================================================
-   FIX LỖI LỆCH CỘT SẢN PHẨM (THỤT THÒ)
-   ======================================================= */
 
-/* Căn trái cho tiêu đề cột "Sản phẩm" (cột số 2) */
-.cart-container th:nth-child(2) {
-    text-align: left;
-    padding-left: 20px; /* Đẩy lề vào một chút cho thoáng */
-}
-
-/* Căn trái và dàn hàng ngang (flex) cho ảnh & chữ trong cột "Sản phẩm" */
-.cart-container td:nth-child(2) {
-    text-align: left;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Ép tất cả bắt đầu thẳng tắp từ lề trái */
-    padding-left: 20px; /* Khớp lề với tiêu đề ở trên */
-    border-bottom: none; /* Xóa viền thừa do flex box trên thẻ td thỉnh thoảng gây ra */
-}
-
-/* Ép border-bottom sang thẻ tr để bảng không bị đứt nét khi dùng flex */
-.cart-container tr {
-    border-bottom: 1px solid #f1f5f9;
-}
-.cart-container td {
-    border-bottom: none; /* Bỏ viền cũ ở td đi */
-}
-
-/* =======================================================
-   TRANG TRÍ TIÊU ĐỀ & NÚT TRỞ VỀ TRANG CHỦ
-   ======================================================= */
-
-/* 1. Tút lại chữ "Giỏ Hàng" */
 .cart-container h1 {
     font-size: 32px;
-    color: #1e293b;         /* Màu xanh đen hiện đại thay vì đen tuyền */
+    color: #1e293b;
     margin-top: 0;
-    margin-bottom: 5px;
+    margin-bottom: 15px !important;
     font-weight: 800;
-    letter-spacing: -0.5px; /* Ép chữ xít lại chút nhìn sang hơn */
+    letter-spacing: -0.5px;
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-/* Tự động thêm icon xe đẩy trước chữ Giỏ Hàng */
 .cart-container h1::before {
     content: "🛒";
     font-size: 30px;
 }
 
-/* 2. Tút lại nút "Trở về trang chủ" */
 .cart-container > a {
     display: inline-block;
     font-size: 15px;
-    color: #64748b !important; /* Dùng !important để ghi đè style inline trong HTML */
+    color: #64748b !important;
     text-decoration: none !important;
     margin-bottom: 25px;
     font-weight: 500;
-    transition: all 0.3s ease; /* Hiệu ứng chuyển động mượt */
+    transition: all 0.3s ease;
 }
 
-/* Hiệu ứng hover cho nút quay lại */
 .cart-container > a:hover {
-    color: #2563eb !important; /* Đổi màu xanh đậm khi di chuột */
-    transform: translateX(-5px); /* Trượt nhẹ sang trái tạo cảm giác tương tác */
+    color: #2563eb !important;
+    transform: translateX(-5px);
     text-decoration: underline !important;
 }
-/* Tăng khoảng cách giữa chữ Giỏ Hàng và nút Trở về trang chủ */
-.cart-container h1 {
-    margin-bottom: 15px !important; /* Nới rộng ra thành 15px (hoặc ông có thể tăng lên 20px tùy mắt) */
-}
-
-/* =========================================
-   CSS DÀNH RIÊNG CHO GIAO DIỆN ADMIN
-   ========================================= */
-body { display: flex; background-color: #f4f7f6; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
-/* THANH MENU BÊN TRÁI */
-.sidebar { width: 280px; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); color: white; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); overflow-y: auto; }
-.sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-.sidebar-header h2 { margin: 0; color: #f39c12; font-family: 'Lobster', cursive; font-size: 28px; letter-spacing: 2px; }
-.sidebar-header p { margin: 5px 0 0 0; font-size: 12px; color: #bdc3c7; text-transform: uppercase; }
-
-.admin-menu { list-style: none; padding: 0 15px; margin: 0; }
-.admin-menu li { margin-bottom: 8px; }
-.admin-menu a { display: flex; align-items: center; padding: 15px 20px; color: #ecf0f1; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: 8px; transition: all 0.3s ease; }
-.admin-menu a:hover, .admin-menu a.active { background-color: #f39c12; color: #fff; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); transform: translateX(5px); }
-.admin-menu i { margin-right: 15px; font-size: 18px; }
-.logout-btn { margin-top: 50px; background-color: rgba(231, 76, 60, 0.2) !important; color: #e74c3c !important; border: 1px solid rgba(231, 76, 60, 0.5); }
-.logout-btn:hover { background-color: #e74c3c !important; color: #fff !important; }
-
-/* KHU VỰC NỘI DUNG CHÍNH */
-.main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-.page-header h1 { margin: 0; color: #2c3e50; font-size: 24px; }
-
-/* THỐNG KÊ */
-.card-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
-.stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid #3498db; display: flex; flex-direction: column; justify-content: center; }
-.stat-card:nth-child(2) { border-color: #e74c3c; }
-.stat-card h3 { margin: 0 0 10px 0; color: #7f8c8d; font-size: 16px; text-transform: uppercase; }
-.stat-card .value { font-size: 36px; font-weight: bold; color: #2c3e50; }
-
-/* BẢNG DỮ LIỆU */
-.table-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-.data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-.data-table th { background-color: #f8f9fa; color: #2c3e50; padding: 15px; text-align: left; border-bottom: 2px solid #e2e8f0; }
-.data-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: #34495e; vertical-align: middle; }
-.data-table tr:hover { background-color: #fdfdfd; }
-
-.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-.status-active { background: #d1fae5; color: #065f46; }
-.status-pause { background: #fef3c7; color: #92400e; }
-
-/* NÚT THAO TÁC */
-.btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin-right: 5px; margin-bottom: 5px;}
-.btn-view { background-color: #9b59b6; color: white; }
-.btn-view:hover { background-color: #8e44ad; }
-.btn-detail { background-color: #f39c12; color: white; }
-.btn-detail:hover { background-color: #d68910; }
-.btn-edit { background-color: #3498db; color: white; }
-.btn-edit:hover { background-color: #2980b9; }
-.btn-delete { background-color: #e74c3c; color: white; margin-right: 0;}
-.btn-delete:hover { background-color: #c0392b; }
-
-/* MODAL CHUNG */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
-.modal-content { background: white; padding: 30px; border-radius: 12px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
-.modal-md { width: 450px; max-width: 90%; }
-.modal-lg { width: 850px; max-width: 95%; }
-
-.close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: 0.2s; }
-.close:hover { color: #334155; }
-.form-group { margin-bottom: 15px; text-align: left; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; }
-.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; outline: none; }
-.form-group input:focus { border-color: #3498db; }
-.btn-save { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-.btn-save:hover { background: #219150; }
-
-.search-input-box { padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; width: 280px; font-family: inherit; transition: 0.3s; }
-.search-input-box:focus { border-color: #f39c12; box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
-
-/* LƯỚI NHẬP HÀNG */
-.import-grid { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 20px;}
