@@ -320,7 +320,74 @@ nav a:hover {
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     transform: translateY(-2px); /* Hiệu ứng nảy lên một chút */
 }
-/* --- Style cho trang Danh mục sách --- */
+
+/* =========================================================
+   GIAO DIỆN HỘP GỢI Ý TÌM KIẾM
+   ========================================================= */
+.suggestions-box {
+    position: absolute;
+    top: 110%; /* Nằm ngay sát dưới thanh tìm kiếm */
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Đổ bóng sâu để nổi bật lên trên web */
+    max-height: 350px;
+    overflow-y: auto; /* Nếu gợi ý nhiều quá thì có thanh cuộn */
+    z-index: 9999; /* Luôn nổi lên trên cùng, không bị các khối khác đè lên */
+    display: none; /* Mặc định giấu đi, khi nào gõ chữ mới hiện */
+}
+
+/* Từng thẻ gợi ý sách bên trong hộp */
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f2f6;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: background 0.2s;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+/* Hiệu ứng rê chuột vào thẻ gợi ý */
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.suggestion-item:hover h4 {
+    color: #f39c12; /* Đổi màu tên sách thành cam */
+}
+
+/* Ảnh bìa thu nhỏ trong hộp gợi ý */
+.suggestion-item img {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Thông tin sách trong hộp gợi ý */
+.suggestion-item-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.suggestion-item-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #e74c3c;
+    font-weight: bold;
+}
+/* =========================================================
+   TRANG DANH MỤC SÁCH (Bộ lọc & Lưới 4 cột)
+   ========================================================= */
 
 /* 1. Thanh bộ lọc (Filter Bar) */
 .filter-bar {
@@ -354,12 +421,12 @@ nav a:hover {
     background-color: #f8fafc;
 }
 
-/* 2. Lưới sách 4 cột (Grid 4x4) */
+/* 2. Lưới sách 4 cột (Grid 4x4) - ĐÂY CHÍNH LÀ ĐOẠN ĐÃ BỊ MẤT */
 .book-catalog-grid {
     display: grid;
-    /* Chia làm 4 cột bằng nhau */
+    /* Chia làm 4 cột bằng nhau, khoảng cách 30px */
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px; /* Khoảng cách giữa các quyển sách */
+    gap: 30px;
 }
 
 /* 3. Phân trang (Pagination) */
@@ -403,7 +470,6 @@ nav a:hover {
         align-items: flex-start;
     }
 }
-
 /* =========================================================
    CSS DÀNH RIÊNG CHO TRANG CHI TIẾT SẢN PHẨM
    ========================================================= */
@@ -421,7 +487,7 @@ nav a:hover {
     color: #f39c12;
 }
 
-/* Khối chính (Ảnh & Chữ) */
+/* Khối chính (Ảnh & Chữ) - Dùng Flex để chia 2 cột */
 .product-detail-wrapper {
     display: flex;
     gap: 50px;
@@ -432,7 +498,7 @@ nav a:hover {
     margin-bottom: 30px;
 }
 
-/* Khối Ảnh bìa */
+/* Khối Ảnh bìa (Cột trái) */
 .product-gallery {
     width: 35%;
     text-align: center;
@@ -447,7 +513,7 @@ nav a:hover {
     transform: scale(1.03); /* Phóng to nhẹ khi rê chuột vào ảnh */
 }
 
-/* Khối Chữ và Giá */
+/* Khối Chữ và Giá (Cột phải) */
 .product-info-main {
     width: 65%;
 }
@@ -471,21 +537,21 @@ nav a:hover {
     font-weight: 600;
 }
 .product-meta .highlight-text {
-    color: #3498db; /* Màu xanh nước biển cho Nhà cung cấp */
+    color: #3498db;
 }
 
 /* Cục Hiển thị Giá tiền */
 .product-price-box {
-    background: #fdf2f2; /* Nền đỏ cực nhạt */
+    background: #fdf2f2;
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 30px;
-    border-left: 5px solid #c92127; /* Vạch đỏ bên trái */
+    border-left: 5px solid #c92127;
 }
 .current-price {
     font-size: 38px;
     font-weight: 800;
-    color: #c92127; /* Màu đỏ Fahasa */
+    color: #c92127;
 }
 
 /* Nút bấm & Số lượng */
@@ -592,379 +658,3 @@ nav a:hover {
     color: #4a4a4a;
     text-align: justify;
 }
-
-/* =========================================================
-   GIAO DIỆN HỘP GỢI Ý TÌM KIẾM
-   ========================================================= */
-.suggestions-box {
-    position: absolute;
-    top: 110%; /* Nằm ngay sát dưới thanh tìm kiếm */
-    left: 0;
-    width: 100%;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Đổ bóng sâu để nổi bật */
-    max-height: 400px;
-    overflow-y: auto; /* Có thanh cuộn nếu nhiều sách */
-    z-index: 9999; /* Luôn nổi lên trên cùng, không bị đè */
-    display: none; /* Mặc định giấu đi */
-    text-align: left; /* Căn lề trái cho chữ */
-}
-
-/* Từng thẻ gợi ý sách bên trong hộp */
-.suggestion-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    border-bottom: 1px solid #f1f2f6;
-    text-decoration: none;
-    color: #2c3e50;
-    transition: background 0.2s;
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
-}
-
-.suggestion-item:hover {
-    background-color: #f8f9fa;
-}
-
-.suggestion-item:hover h4 {
-    color: #f39c12; /* Đổi màu chữ thành cam khi di chuột */
-}
-
-/* ĐÂY LÀ ĐOẠN QUAN TRỌNG NHẤT: ÉP ẢNH NHỎ LẠI */
-.suggestion-item img {
-    width: 45px !important;      /* Ép chiều rộng nhỏ xíu */
-    height: 65px !important;     /* Ép chiều cao tương xứng */
-    object-fit: cover;           /* Cắt ảnh vuông vắn không bị méo */
-    border-radius: 4px;
-    margin-right: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Thông tin sách trong hộp gợi ý */
-.suggestion-item-info h4 {
-    margin: 0 0 5px 0;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.suggestion-item-info p {
-    margin: 0;
-    font-size: 13px;
-    color: #e74c3c;
-    font-weight: bold;
-}
-/* =========================================================
-   MỞ RỘNG THANH TÌM KIẾM CHO RỘNG RÃI
-   ========================================================= */
-/* Kéo dài thanh tìm kiếm trên Header */
-.search-bar {
-    width: 450px !important; /* Bạn có thể tăng lên 500px nếu thấy vẫn chưa đủ dài */
-}
-
-/* Đảm bảo ô nhập chữ giãn đều theo thanh tìm kiếm */
-#search-input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Ép tên sách KHÔNG BAO GIỜ được rớt dòng, nếu dài quá thì hiện dấu ... */
-.suggestion-item-info h4 {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 330px; /* Giới hạn độ dài chữ để chừa chỗ cho giá tiền */
-    display: block;
-}
-
-/* =======================================================
-   CSS CHO TRANG GIỎ HÀNG VÀ THANH TOÁN
-   ======================================================= */
-
-/* 1. Khung chứa chính */
-.cart-container {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 25px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    font-family: 'Inter', sans-serif;
-}
-
-/* 2. Bảng giỏ hàng & Theo dõi đơn */
-.cart-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-.cart-container th {
-    background-color: #f8f9fa;
-    padding: 12px;
-    text-align: center;
-    border-bottom: 2px solid #e2e8f0;
-    color: #475569;
-}
-
-.cart-container td {
-    padding: 15px 10px;
-    text-align: center;
-    vertical-align: middle;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-/* 3. Hình ảnh sản phẩm */
-.item-img {
-    width: 60px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 6px;
-    margin-right: 15px;
-    vertical-align: middle;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* 4. Cụm nút Tăng/Giảm số lượng */
-.qty-box {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.qty-btn {
-    width: 32px;
-    height: 32px;
-    background: #f8f9fa;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    color: #334155;
-    transition: 0.2s;
-}
-
-.qty-btn:hover { background: #e2e8f0; }
-
-.qty-input {
-    width: 45px;
-    height: 32px;
-    text-align: center;
-    border: none;
-    border-left: 1px solid #cbd5e1;
-    border-right: 1px solid #cbd5e1;
-    outline: none;
-    font-weight: 600;
-}
-
-/* 5. Nút Xóa */
-.btn-delete {
-    padding: 6px 12px;
-    color: #ef4444;
-    background: transparent;
-    border: 1px solid #ef4444;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease-in-out;
-}
-
-.btn-delete:hover {
-    background: #ef4444;
-    color: white;
-}
-
-/* 6. Thanh Tổng kết và Đặt hàng */
-.checkout-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 25px;
-    padding: 15px 20px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.total-price {
-    font-size: 1.25em;
-    font-weight: 800;
-    color: #e11d48;
-}
-
-.btn-checkout {
-    padding: 12px 30px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-checkout:hover { background: #1d4ed8; }
-
-/* 7. Trạng thái theo dõi đơn hàng */
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85em;
-    font-weight: 700;
-}
-.status-pending { background: #fef08a; color: #854d0e; }
-.status-approved { background: #bbf7d0; color: #166534; }
-
-/* 8. Modal (Popup) Điền thông tin giao hàng */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    width: 450px;
-    max-width: 90%;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-.close {
-    position: absolute;
-    right: 20px; top: 15px;
-    font-size: 28px;
-    cursor: pointer;
-    color: #94a3b8;
-    transition: 0.2s;
-}
-
-.close:hover { color: #334155; }
-
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
-.form-group input, .form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-}
-.form-group input:focus, .form-group textarea:focus { border-color: #2563eb; }
-
-.radio-group { margin: 15px 0; }
-.radio-group label { margin-right: 20px; cursor: pointer; font-weight: 500; }
-
-.qr-box {
-    display: none;
-    text-align: center;
-    padding: 30px;
-    background: #f1f5f9;
-    border-radius: 8px;
-    margin: 15px 0;
-    border: 2px dashed #94a3b8;
-    font-weight: bold;
-    color: #475569;
-}
-
-.btn-confirm {
-    width: 100%;
-    padding: 14px;
-    background: #e11d48;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1em;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: 0.2s;
-}
-
-.btn-confirm:hover { background: #be123c; }
-/* =======================================================
-   FIX LỖI LỆCH CỘT SẢN PHẨM (THỤT THÒ)
-   ======================================================= */
-
-/* Căn trái cho tiêu đề cột "Sản phẩm" (cột số 2) */
-.cart-container th:nth-child(2) {
-    text-align: left;
-    padding-left: 20px; /* Đẩy lề vào một chút cho thoáng */
-}
-
-/* Căn trái và dàn hàng ngang (flex) cho ảnh & chữ trong cột "Sản phẩm" */
-.cart-container td:nth-child(2) {
-    text-align: left;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Ép tất cả bắt đầu thẳng tắp từ lề trái */
-    padding-left: 20px; /* Khớp lề với tiêu đề ở trên */
-    border-bottom: none; /* Xóa viền thừa do flex box trên thẻ td thỉnh thoảng gây ra */
-}
-
-/* Ép border-bottom sang thẻ tr để bảng không bị đứt nét khi dùng flex */
-.cart-container tr {
-    border-bottom: 1px solid #f1f5f9;
-}
-.cart-container td {
-    border-bottom: none; /* Bỏ viền cũ ở td đi */
-}
-
-/* =======================================================
-   TRANG TRÍ TIÊU ĐỀ & NÚT TRỞ VỀ TRANG CHỦ
-   ======================================================= */
-
-/* 1. Tút lại chữ "Giỏ Hàng" */
-.cart-container h1 {
-    font-size: 32px;
-    color: #1e293b;         /* Màu xanh đen hiện đại thay vì đen tuyền */
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-weight: 800;
-    letter-spacing: -0.5px; /* Ép chữ xít lại chút nhìn sang hơn */
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Tự động thêm icon xe đẩy trước chữ Giỏ Hàng */
-.cart-container h1::before {
-    content: "🛒";
-    font-size: 30px;
-}
-
-/* 2. Tút lại nút "Trở về trang chủ" */
-.cart-container > a {
-    display: inline-block;
-    font-size: 15px;
-    color: #64748b !important; /* Dùng !important để ghi đè style inline trong HTML */
-    text-decoration: none !important;
-    margin-bottom: 25px;
-    font-weight: 500;
-    transition: all 0.3s ease; /* Hiệu ứng chuyển động mượt */
-}
-
-/* Hiệu ứng hover cho nút quay lại */
-.cart-container > a:hover {
-    color: #2563eb !important; /* Đổi màu xanh đậm khi di chuột */
-    transform: translateX(-5px); /* Trượt nhẹ sang trái tạo cảm giác tương tác */
-    text-decoration: underline !important;
-}
-/* Tăng khoảng cách giữa chữ Giỏ Hàng và nút Trở về trang chủ */
-.cart-container h1 {
-    margin-bottom: 15px !important; /* Nới rộng ra thành 15px (hoặc ông có thể tăng lên 20px tùy mắt) */
-}
-

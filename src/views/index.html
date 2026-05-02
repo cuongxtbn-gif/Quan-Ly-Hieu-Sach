@@ -183,13 +183,35 @@
         if (tenUser) { // Nếu có người đang đăng nhập
             var menuLogin = document.getElementById('menu-login');
 
-            // 1. Đổi chữ thành tên người dùng (màu cam cho nổi bật)
-            // 2. Thêm nút "Đăng xuất" nhỏ ngay bên cạnh
+            // Đổi chữ thành tên người dùng
             menuLogin.innerHTML = `
                 <a href="#" style="color: #f39c12; font-weight: bold;">👋 Chào, ${tenUser}</a>
                 <a href="#" onclick="dangXuat()" style="font-size: 12px; color: #e74c3c; margin-left: 5px; cursor: pointer;">(Thoát)</a>
             `;
         }
+
+        // --- THỦ THUẬT ẨN SÁCH HTML ĐÃ BỊ ADMIN XÓA ---
+        const khoSachAdmin = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+        // Lấy ra danh sách các ID sách đang nằm trong thùng rác
+        const danhSachIdDaXoa = khoSachAdmin.filter(s => s.isDeleted === true).map(s => s.id);
+
+        // Lùng sục toàn bộ thẻ sách cứng trên trang chủ
+        document.querySelectorAll('.book-card').forEach(card => {
+            const nutMua = card.querySelector('.btn-buy');
+            if (nutMua) {
+                // Lấy ID sách từ lệnh onclick (vd: chi-tiet-sach.html?id=bo-gia)
+                const lenhOnclick = nutMua.getAttribute('onclick');
+                const match = lenhOnclick.match(/id=([^']+)/);
+                if (match && match[1]) {
+                    const idSachHTML = match[1];
+                    // Nếu ID này có trong thùng rác -> Cho thẻ div đó "bốc hơi"
+                    if (danhSachIdDaXoa.includes(idSachHTML)) {
+                        card.style.display = 'none';
+                    }
+                }
+            }
+        });
+        // --- KẾT THÚC THỦ THUẬT ---
     });
 
     // Hàm xử lý khi bấm nút (Thoát)
@@ -198,7 +220,6 @@
         window.location.reload(); // Tải lại trang web về trạng thái ban đầu
     }
 </script>
-
 <!-- ==============================================
      JAVASCRIPT: THANH TÌM KIẾM THÔNG MINH (TÊN, TÁC GIẢ, THỂ LOẠI)
      ============================================== -->
@@ -264,7 +285,14 @@
     };
 
     // Chuyển Object thành dạng Mảng (Array) để dễ dàng lọc
-    const danhSachTimKiem = Object.values(bookDatabase);
+    // --- BẮT ĐẦU ĐỒNG BỘ THANH TÌM KIẾM ---
+    if (!localStorage.getItem('adc_books_db')) {
+        localStorage.setItem('adc_books_db', JSON.stringify(Object.values(bookDatabase)));
+    }
+    const tatCaSach = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+    // Lọc bỏ sách đã vào thùng rác
+    const danhSachTimKiem = tatCaSach.filter(sach => sach.isDeleted !== true);
+    // --- KẾT THÚC ĐỒNG BỘ ---
 
     // 2. HÀM CHUẨN HÓA TIẾNG VIỆT (Bỏ dấu, viết thường)
     function xoaDau(str) {
