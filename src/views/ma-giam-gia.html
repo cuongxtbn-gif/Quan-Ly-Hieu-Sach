@@ -281,19 +281,21 @@
     <div class="voucher-section">
         <h2>Voucher đang hoạt động</h2>
         <div class="voucher-grid">
-            <div class="voucher-card voucher-active">
+           <!-- Sửa thẻ mã 8% -->
+            <div class="voucher-card voucher-active" id="voucher-8">
                 <span class="v-badge bg-red">ĐANG CHẠY</span>
                 <h3>🎟️ Giảm 8% - Khách hàng mới</h3>
                 <p>Loại: <b>Ưu đãi đơn đầu tiên</b></p>
                 <p>Bắt đầu: <b>00h00 - 01/01/2026</b></p>
                 <p>Kết thúc: <b>23h59 - 31/12/2026</b></p>
-                <p>Số lượng còn: <span style="color:#e74c3c; font-weight:bold">500</span> <a href="#" style="font-size:11px; margin-left:10px">Chỉnh sửa</a></p>
+                <p>Số lượng còn: <span id="qty-voucher-8" style="color:#e74c3c; font-weight:bold">500</span> <a href="#" style="font-size:11px; margin-left:10px">Chỉnh sửa</a></p>
             </div>
 
-            <div class="voucher-card voucher-active">
-                <span class="v-badge bg-red" style="background:#f39c12">HÔM NAY</span>
+            <!-- Sửa thẻ mã 1/5 -->
+            <div class="voucher-card voucher-active" data-end="2026-05-01T23:59:59" id="voucher-1-5">
+                <span class="v-badge bg-red" id="badge-1-5" style="background:#f39c12">HÔM NAY</span>
                 <h3>🎟️ Mừng 1/5 - Quốc tế Lao Động</h3>
-                <p>Loại: <b>Giảm giá trực tiếp toàn sàn</b></p>
+                <p>Loại: <b>Giảm 5% toàn sản phẩm</b></p>
                 <p>Bắt đầu: <b>00h00 - 01/05/2026</b></p>
                 <p>Kết thúc: <b>23h59 - 01/05/2026</b></p>
                 <p>Số lượng còn: <span style="color:#e74c3c; font-weight:bold">150</span> <a href="#" style="font-size:11px; margin-left:10px">Chỉnh sửa</a></p>
@@ -305,24 +307,91 @@
                 <p>Loại: <b>Giảm 10% (Tối đa 50k)</b></p>
                 <p>Bắt đầu: <b>00h00 - 05/05/2026</b></p>
                 <p>Kết thúc: <b>23h59 - 05/05/2026</b></p>
-                <p>Số lượng còn: <span style="color:#e74c3c; font-weight:bold">1000</span> <a href="#" style="font-size:11px; margin-left:10px">Chỉnh sửa</a></p>
+                <p>Số lượng còn: <span id="qty-voucher-8" style="color:#e74c3c; font-weight:bold">1000</span> <a href="#" style="font-size:11px; margin-left:10px">Chỉnh sửa</a></p>
             </div>
         </div>
     </div>
 
-    <!-- 4. Voucher đã hết hạn -->
-    <div class="voucher-section">
-        <h2 style="color: #95a5a6; border-color: #95a5a6;">Đã hết hạn</h2>
-        <div class="voucher-grid">
-            <div class="voucher-card voucher-expired">
-                <span class="v-badge bg-gray">HẾT HẠN</span>
-                <h3 style="color: #7f8c8d;">🎟️ Chào mừng Giải Phóng 30/4</h3>
-                <p>Loại: Khuyến mãi dịp nghỉ lễ</p>
-                <p>Bắt đầu: 00h00 - 25/04/2026</p>
-                <p>Hết hạn: 23h59 - 30/04/2026</p>
-                <p>Tình trạng: <span style="color:#95a5a6">Đã kết thúc chương trình</span></p>
-            </div>
-        </div>
+  <!-- 4. Voucher đã hết hạn -->
+<div class="voucher-section">
+    <h2 style="color: #95a5a6; border-color: #95a5a6;">Đã hết hạn</h2>
+    <!-- Đảm bảo có class voucher-grid ở đây để dàn hàng ngang -->
+    <div class="voucher-grid" id="expired-grid">
+        <!-- Tìm đến mã 30/4 và thêm thuộc tính data-end -->
+<div class="voucher-card voucher-expired" data-end="2026-04-30T23:59:59">
+    <span class="v-badge bg-gray">HẾT HẠN</span>
+    <h3 style="color: #7f8c8d;">🎟️ Chào mừng Giải Phóng 30/4</h3>
+    <p>Loại: Khuyến mãi dịp nghỉ lễ</p>
+    <p>Bắt đầu: 00h00 - 25/04/2026</p>
+    <p>Hết hạn: 23h59 - 30/04/2026</p>
+    <p>Tình trạng: <span style="color:#95a5a6">Đã kết thúc chương trình</span></p>
+</div>
+        <!-- Khi JavaScript chạy, mã 1/5 sẽ tự động được nhảy vào đây và xếp ngay bên cạnh mã 30/4 -->
     </div>
 </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. TỰ ĐỘNG TRỪ SỐ LƯỢNG MÃ 8% (Đọc từ dữ liệu khách hàng)
+        let totalUsed8 = 0;
+        // Quét bộ nhớ xem có bao nhiêu tài khoản đã lưu biến 'usedVoucher8_...'
+        for (let i = 0; i < localStorage.length; i++) {
+            if (localStorage.key(i).startsWith('usedVoucher8_')) {
+                totalUsed8++;
+            }
+        }
+        const initialQty8 = 500;
+        const currentQty8 = initialQty8 - totalUsed8;
+        const qtyElement8 = document.getElementById('qty-voucher-8');
+        if (qtyElement8) {
+            qtyElement8.innerText = currentQty8; // Cập nhật (ví dụ: về 499)
+        }
+
+        // 2. KIỂM TRA THỜI GIAN VÀ SẮP XẾP MÃ HẾT HẠN
+        const now = new Date();
+        const allVouchers = document.querySelectorAll('.voucher-card');
+        const expiredGrid = document.getElementById('expired-grid');
+
+        // Bước A: Quét và chuyển các mã vừa hết hạn vào vùng 'expired-grid'
+        allVouchers.forEach(card => {
+            const endDateStr = card.getAttribute('data-end');
+            if (endDateStr) {
+                const endDate = new Date(endDateStr);
+                if (now > endDate) {
+                    // Nếu chưa nằm trong vùng hết hạn thì chuyển vào
+                    if (!card.closest('#expired-grid')) {
+                        expiredGrid.appendChild(card);
+                        // Cập nhật lại giao diện cho mã vừa bị chuyển xuống
+                        card.classList.replace('voucher-active', 'voucher-expired');
+                        const badge = card.querySelector('.v-badge');
+                        badge.className = 'v-badge bg-gray';
+                        badge.innerText = 'HẾT HẠN';
+                        badge.style.background = '';
+                    }
+                }
+            }
+        });
+
+        // Bước B: Sắp xếp các mã trong vùng Hết hạn (Mới nhất lên đầu)
+        const expiredCards = Array.from(expiredGrid.children);
+        expiredCards.sort((a, b) => {
+            const dateA = new Date(a.getAttribute('data-end'));
+            const dateB = new Date(b.getAttribute('data-end'));
+            return dateB - dateA; // Sắp xếp giảm dần theo thời gian
+        });
+
+        // Xóa nội dung cũ và chèn lại theo thứ tự đã sắp xếp
+        expiredGrid.innerHTML = '';
+        expiredCards.forEach(card => expiredGrid.appendChild(card));
+        // 3. TỰ ĐỘNG TÍNH LẠI CON SỐ THỐNG KÊ TRÊN CÙNG
+        const activeCount = document.querySelectorAll('.voucher-active').length;
+        const expiredCount = document.querySelectorAll('.voucher-expired').length;
+        const statValues = document.querySelectorAll('.stat-card .value');
+        
+        if(statValues.length >= 2) {
+            statValues[0].innerText = activeCount < 10 ? '0' + activeCount : activeCount;
+            statValues[1].innerText = expiredCount < 10 ? '0' + expiredCount : expiredCount;
+        }
+    });
+</script>
   
