@@ -46,7 +46,15 @@
         </thead>
         <tbody id="cart-body"></tbody>
     </table>
-
+<!-- KHOẢNG CHỨA VOUCHER THÊM MỚI -->
+    <div class="voucher-container" id="voucherContainer" style="display: none; background: #fff3e0; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px dashed #e67e22; align-items: center; justify-content: space-between;">
+        <div style="color: #d35400;">
+            <strong style="font-size: 16px;">🎟️ Ưu đãi dành cho bạn:</strong> Giảm 8% cho đơn hàng này (Chỉ dùng 1 lần)
+        </div>
+        <button id="btnApplyVoucher" style="background: #e67e22; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Áp dụng</button>
+    </div>
+    <!-- KẾT THÚC KHOẢNG CHỨA VOUCHER -->
+     
     <div class="checkout-bar">
         <div><input type="checkbox" id="selectAllBottom"> <label for="selectAllBottom">Chọn tất cả</label></div>
         <div class="total-price" id="totalPrice">Tổng thanh toán (0 sản phẩm): 0đ</div>
@@ -110,6 +118,50 @@
     let checkedIndexes = new Set();
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let currentTotalToPay = 0;
+    // BIẾN THÊM MỚI CHO VOUCHER
+    let isVoucherApplied = false;
+    let discountAmount = 0;
+
+    // HÀM XỬ LÝ KHI BẤM NÚT ÁP DỤNG VOUCHER
+    function applyVoucherLogic() {
+        const currentUser = sessionStorage.getItem('tenKhachHang');
+        if (!currentUser) return alert("Vui lòng đăng nhập để dùng voucher!");
+
+        if (checkedIndexes.size === 0) {
+            alert("Vui lòng chọn sản phẩm trước khi áp dụng voucher!");
+            return;
+        }
+
+        if (!isVoucherApplied) {
+            isVoucherApplied = true;
+            document.getElementById('btnApplyVoucher').innerText = 'Đã áp dụng (-8%)';
+            document.getElementById('btnApplyVoucher').style.background = '#27ae60';
+        } else {
+            isVoucherApplied = false;
+            document.getElementById('btnApplyVoucher').innerText = 'Áp dụng';
+            document.getElementById('btnApplyVoucher').style.background = '#e67e22';
+        }
+        calculateTotal();
+    }
+
+    // Kiểm tra xem đã dùng voucher chưa để hiện/ẩn
+    function checkVoucherVisibility() {
+        const currentUser = sessionStorage.getItem('tenKhachHang');
+        const voucherContainer = document.getElementById('voucherContainer');
+        if (!voucherContainer) return;
+
+        if (currentUser) {
+            const hasUsed = localStorage.getItem('usedVoucher8_' + currentUser);
+            if (!hasUsed) {
+                voucherContainer.style.display = 'flex'; // Hiện ra nếu chưa dùng
+            } else {
+                voucherContainer.style.display = 'none'; // Ẩn đi nếu đã dùng
+            }
+        }
+    }
+
+    // Gắn sự kiện cho nút áp dụng
+    document.getElementById('btnApplyVoucher').addEventListener('click', applyVoucherLogic);
 
     function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
 
@@ -197,7 +249,7 @@
         }
     };
 
-    function calculateTotal() {
+   function calculateTotal() {
         const checkboxes = document.querySelectorAll('.item-check');
         let total = 0; let count = 0;
         checkboxes.forEach((cb) => {
@@ -207,11 +259,26 @@
                 count++;
             }
         });
-        currentTotalToPay = total;
-        totalPriceEl.innerText = `Tổng thanh toán (${count} sản phẩm): ${total.toLocaleString('vi-VN')}đ`;
+
+        // ÁP DỤNG MÃ GIẢM GIÁ NẾU CÓ
+        if (isVoucherApplied && total > 0) {
+            discountAmount = total * 0.08; // Tính giảm 8%
+            currentTotalToPay = total - discountAmount;
+            totalPriceEl.innerHTML = `Tổng thanh toán (${count} sản phẩm): <del style="color:#999; font-size:14px; margin-right:8px;">${total.toLocaleString('vi-VN')}đ</del> <span style="color:#e11d48;">${currentTotalToPay.toLocaleString('vi-VN')}đ</span>`;
+        } else {
+            discountAmount = 0;
+            currentTotalToPay = total;
+            totalPriceEl.innerText = `Tổng thanh toán (${count} sản phẩm): ${total.toLocaleString('vi-VN')}đ`;
+            
+            // Nếu bỏ chọn hết sản phẩm thì tự tắt voucher
+            if (count === 0 && isVoucherApplied) {
+                isVoucherApplied = false;
+                document.getElementById('btnApplyVoucher').innerText = 'Áp dụng';
+                document.getElementById('btnApplyVoucher').style.background = '#e67e22';
+            }
+        }
         return { total, count };
     }
-
     function attachCheckboxListeners() {
         document.querySelectorAll('.item-check').forEach(cb => {
             cb.addEventListener('change', (e) => {
@@ -236,18 +303,36 @@
 
     // XỬ LÝ ĐẶT HÀNG
     const modal = document.getElementById('checkoutModal');
+    // XỬ LÝ BẤM NÚT ĐẶT HÀNG (Có lời nhắc Voucher)
     document.getElementById('btnShowCheckout').addEventListener('click', () => {
-        // Kiểm tra xem đã đăng nhập chưa
         const currentUser = sessionStorage.getItem('tenKhachHang');
         if (!currentUser) {
             alert('Bạn cần đăng nhập để tiến hành đặt hàng!');
-            window.location.href = 'dang-nhap.html'; // Chuyển hướng sang trang đăng nhập
+            window.location.href = 'dang-nhap.html'; 
             return;
         }
 
         if (checkedIndexes.size === 0) return alert('Vui lòng chọn ít nhất 1 sản phẩm!');
+
+        // LỜI NHẮC NẾU QUÊN DÙNG VOUCHER
+        const hasUsedVoucher = localStorage.getItem('usedVoucher8_' + currentUser);
+        if (!hasUsedVoucher && !isVoucherApplied) {
+            const reminder = confirm('🎁 Bạn đang có 1 Voucher giảm 8% chưa sử dụng. Bạn có muốn áp dụng ngay cho đơn hàng này không?');
+            if (reminder) {
+                applyVoucherLogic(); // Tự động áp dụng và tính lại tiền luôn
+            }
+        }
+
         document.getElementById('modalTotal').innerText = `Tổng tiền cần thanh toán: ${currentTotalToPay.toLocaleString('vi-VN')}đ`;
         modal.style.display = 'flex';
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+
+    document.getElementsByName('payMethod').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('qrArea').style.display = e.target.value === 'qr' ? 'block' : 'none';
+        });
     });
     document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
 
@@ -257,8 +342,9 @@
         });
     });
 
+  // XÁC NHẬN ĐẶT HÀNG CUỐI CÙNG
     document.getElementById('btnConfirmOrder').addEventListener('click', () => {
-        const currentUser = sessionStorage.getItem('tenKhachHang'); // Lấy tên tài khoản
+        const currentUser = sessionStorage.getItem('tenKhachHang'); 
         const name = document.getElementById('txtName').value.trim();
         const phone = document.getElementById('txtPhone').value.trim();
         const address = document.getElementById('txtAddress').value.trim();
@@ -277,7 +363,7 @@
         const newOrder = {
             id: '#ORD-' + orderSequence + '-' + randomStr,
             date: exactTime,
-            username: currentUser, // <-- THÊM DÒNG NÀY ĐỂ GẮN MÁC CHỦ NHÂN ĐƠN HÀNG
+            username: currentUser, 
             customerName: name,
             phone: phone,
             address: address,
@@ -288,6 +374,12 @@
         orders.push(newOrder);
         localStorage.setItem('adc_orders', JSON.stringify(orders));
 
+        // LƯU LẠI VÀ THU HỒI VOUCHER NẾU KHÁCH ĐÃ SỬ DỤNG THÀNH CÔNG
+        if (isVoucherApplied) {
+            localStorage.setItem('usedVoucher8_' + currentUser, 'true');
+            isVoucherApplied = false;
+        }
+
         alert('Đặt hàng thành công! Đơn hàng sẽ được chuyển đến Admin.');
 
         cart = cart.filter((_, index) => !checkedIndexes.has(index));
@@ -296,10 +388,11 @@
         modal.style.display = 'none';
         renderCart();
         renderTrackingOrders();
+        checkVoucherVisibility(); // Xóa hộp voucher khỏi màn hình
     });
-
     renderCart();
     renderTrackingOrders();
+    checkVoucherVisibility(); // Thêm dòng này để kiểm tra xem có nên hiện voucher không
 </script>
 
 <script>
