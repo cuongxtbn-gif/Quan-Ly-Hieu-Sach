@@ -128,8 +128,9 @@
         localStorage.setItem('adc_books_db', JSON.stringify(Object.values(bookDatabase)));
     }
 
-    // 2. Từ giờ trở đi, danh sách sách bán ra sẽ đọc trực tiếp từ kho của Admin
-    const danhSachTimKiem = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+    // 2. Lấy kho Admin và LỌC BỎ SÁCH ĐANG Ở TRONG THÙNG RÁC
+    const tatCaSach = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+    const danhSachTimKiem = tatCaSach.filter(sach => sach.isDeleted !== true);
     // --- KẾT THÚC ĐỒNG BỘ ---
 
     // 2. BIẾN CẤU HÌNH & QUẢN LÝ
@@ -154,8 +155,8 @@
         const sachTrongTrang = danhSach.slice(batDau, ketThuc);
 
         sachTrongTrang.forEach(sach => {
-            // Tự động tạo ra idSach từ title
-            const idSach = taoIdTuTenSach(sach.title);
+            // Lấy ID chuẩn xác từ hệ thống
+            const idSach = sach.id;
 
             const bookHTML = `
             <div class="book-card">

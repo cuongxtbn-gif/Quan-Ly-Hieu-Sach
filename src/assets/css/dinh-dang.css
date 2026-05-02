@@ -385,3 +385,276 @@ nav a:hover {
     color: #e74c3c;
     font-weight: bold;
 }
+/* =========================================================
+   TRANG DANH MỤC SÁCH (Bộ lọc & Lưới 4 cột)
+   ========================================================= */
+
+/* 1. Thanh bộ lọc (Filter Bar) */
+.filter-bar {
+    display: flex;
+    gap: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-item label {
+    font-weight: 700;
+    color: #475569;
+}
+
+.filter-item select {
+    padding: 8px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    background-color: #f8fafc;
+}
+
+/* 2. Lưới sách 4 cột (Grid 4x4) - ĐÂY CHÍNH LÀ ĐOẠN ĐÃ BỊ MẤT */
+.book-catalog-grid {
+    display: grid;
+    /* Chia làm 4 cột bằng nhau, khoảng cách 30px */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+/* 3. Phân trang (Pagination) */
+.pagination {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-bottom: 50px;
+}
+
+.page-btn {
+    padding: 10px 20px;
+    border: 1px solid #2563eb;
+    background: white;
+    color: #2563eb;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.page-btn.active, .page-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+/* Responsive: Trên máy tính bảng hiện 2 cột, điện thoại hiện 1 cột */
+@media (max-width: 1024px) {
+    .book-catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .book-catalog-grid {
+        grid-template-columns: 1fr;
+    }
+    .filter-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+/* =========================================================
+   CSS DÀNH RIÊNG CHO TRANG CHI TIẾT SẢN PHẨM
+   ========================================================= */
+.breadcrumb {
+    padding: 15px 0;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+.breadcrumb a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: 0.2s;
+}
+.breadcrumb a:hover {
+    color: #f39c12;
+}
+
+/* Khối chính (Ảnh & Chữ) - Dùng Flex để chia 2 cột */
+.product-detail-wrapper {
+    display: flex;
+    gap: 50px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+/* Khối Ảnh bìa (Cột trái) */
+.product-gallery {
+    width: 35%;
+    text-align: center;
+}
+.product-gallery img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+.product-gallery img:hover {
+    transform: scale(1.03); /* Phóng to nhẹ khi rê chuột vào ảnh */
+}
+
+/* Khối Chữ và Giá (Cột phải) */
+.product-info-main {
+    width: 65%;
+}
+.product-info-main h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.product-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột đều nhau */
+    gap: 15px;
+    margin-bottom: 25px;
+    font-size: 15px;
+    color: #7f8c8d;
+}
+.product-meta span {
+    color: #2c3e50;
+    font-weight: 600;
+}
+.product-meta .highlight-text {
+    color: #3498db;
+}
+
+/* Cục Hiển thị Giá tiền */
+.product-price-box {
+    background: #fdf2f2;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    border-left: 5px solid #c92127;
+}
+.current-price {
+    font-size: 38px;
+    font-weight: 800;
+    color: #c92127;
+}
+
+/* Nút bấm & Số lượng */
+.purchase-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.qty-btn {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border: 1px solid #dcdde1;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+.qty-btn:hover { background: #e0e6ed; }
+.quantity-control input {
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 20px;
+}
+.btn-add-cart, .btn-buy-now {
+    padding: 18px 0;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    flex: 1; /* Hai nút rộng bằng nhau */
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+.btn-add-cart {
+    background: #ffffff;
+    color: #c92127;
+    border: 2px solid #c92127;
+}
+.btn-add-cart:hover {
+    background: #fdf2f2;
+    transform: translateY(-2px);
+}
+.btn-buy-now {
+    background: #c92127;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(201, 33, 39, 0.4);
+}
+.btn-buy-now:hover {
+    background: #a81c21;
+    transform: translateY(-2px);
+}
+
+/* Khối Bảng thông số & Mô tả */
+.product-specs-wrapper {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 50px;
+}
+.product-specs-wrapper h2 {
+    font-size: 22px;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    border-bottom: 3px solid #f8f9fa;
+    padding-bottom: 15px;
+    text-transform: uppercase;
+}
+.specs-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.specs-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f2f6;
+    font-size: 15px;
+    color: #333;
+}
+.specs-table .spec-label {
+    width: 30%;
+    color: #7f8c8d;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+.product-description {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4a4a4a;
+    text-align: justify;
+}

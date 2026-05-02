@@ -60,7 +60,6 @@
         <option value="Văn học">Văn học</option><option value="Kỹ năng">Kỹ năng</option><option value="Kinh tế">Kinh tế</option>
         <option value="Trinh thám">Trinh thám</option><option value="Tâm lý">Tâm lý</option><option value="Ngoại ngữ">Ngoại ngữ</option>
       </select>
-      <!-- Nút thùng rác đã được tối ưu cấu trúc -->
       <button id="btn-toggle-trash" class="btn-trash-view" onclick="toggleTrashMode()" style="display: flex; align-items: center; gap: 5px;">
         <span id="trash-btn-icon">🗑️</span> <span id="trash-btn-text">Thùng rác</span> (<span id="trash-count">0</span>)
       </button>
@@ -74,6 +73,9 @@
       </thead>
       <tbody id="admin-book-body"></tbody>
     </table>
+
+    <!-- VÙNG CHỨA NÚT PHÂN TRANG -->
+    <div id="pagination-controls" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding-bottom: 10px;"></div>
   </div>
 </div>
 
@@ -102,6 +104,8 @@
 
 <script>
   let isTrashMode = false;
+  let currentPage = 1;
+  const booksPerPage = 10;
 
   function xoaDauTiengViet(str) {
     if (!str) return "";
@@ -113,10 +117,8 @@
     let tuKhoa = xoaDauTiengViet(document.getElementById('search-admin-book').value);
     let theLoaiChon = document.getElementById('filter-admin-category').value;
 
-    // Cập nhật số lượng thùng rác
     let trashCount = books.filter(b => b.isDeleted === true).length;
-    let trashCountEl = document.getElementById('trash-count');
-    if(trashCountEl) trashCountEl.innerText = trashCount;
+    document.getElementById('trash-count').innerText = trashCount;
 
     let sachHienThi = books.filter(book => {
       let trangThaiKhop = isTrashMode ? (book.isDeleted === true) : (!book.isDeleted);
@@ -125,43 +127,71 @@
       return trangThaiKhop && khopTheLoai && tenMatch;
     });
 
+    sachHienThi = sachHienThi.slice().reverse();
+
+    let totalPages = Math.ceil(sachHienThi.length / booksPerPage);
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    let startIndex = (currentPage - 1) * booksPerPage;
+    let currentBooks = sachHienThi.slice(startIndex, startIndex + booksPerPage);
+
     const tbody = document.getElementById('admin-book-body');
     let html = '';
-    sachHienThi.slice().reverse().forEach(book => {
+    currentBooks.forEach(book => {
       let stockHtml = (book.stock || 0) > 0 ? `<span class="badge-stock">${book.stock} cuốn</span>` : `<span class="badge-out-stock">Hết hàng</span>`;
       let buttons = isTrashMode ?
               `<button class="action-btn btn-restore" onclick="restoreBook('${book.id}')">🔄 Khôi phục</button><button class="action-btn btn-delete" onclick="permanentDeleteBook('${book.id}')">🧨 Xóa hẳn</button>` :
               `<button class="action-btn btn-edit" onclick="openBookModal('${book.id}')">✏️ Sửa</button><button class="action-btn btn-delete" onclick="softDeleteBook('${book.id}')">🗑️ Xóa</button>`;
 
       html += `<tr>
-            <td><img src="${book.img}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/50x70?text=Loi'"></td>
-            <td><strong>${book.title}</strong></td><td>${book.author}</td><td>${book.category}</td>
-            <td style="color: #e74c3c; font-weight: bold;">${Number(book.price).toLocaleString('vi-VN')} đ</td>
-            <td>${stockHtml}</td><td>${buttons}</td>
-        </tr>`;
+                <td><img src="${book.img}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/50x70?text=Loi'" style="width: 50px; height: 70px; object-fit: cover;"></td>
+                <td><strong>${book.title}</strong></td><td>${book.author}</td><td>${book.category}</td>
+                <td style="color: #e74c3c; font-weight: bold;">${Number(book.price).toLocaleString('vi-VN')} đ</td>
+                <td>${stockHtml}</td><td>${buttons}</td>
+            </tr>`;
     });
     tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center; padding: 20px;">Danh sách trống!</td></tr>';
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages) {
+    let paginationEl = document.getElementById('pagination-controls');
+    if (!paginationEl) return;
+    let html = '';
+    if (totalPages > 1) {
+      html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} style="padding: 6px 12px; border: 1px solid #bdc3c7; background: ${currentPage === 1 ? '#f1f2f6' : 'white'}; border-radius: 4px; cursor: pointer;">Trước</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        let activeStyle = i === currentPage ? 'background: #3498db; color: white; border: 1px solid #3498db;' : 'background: white; border: 1px solid #bdc3c7; color: #333;';
+        html += `<button onclick="changePage(${i})" style="padding: 6px 12px; border-radius: 4px; cursor: pointer; ${activeStyle}">${i}</button>`;
+      }
+      html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} style="padding: 6px 12px; border: 1px solid #bdc3c7; background: ${currentPage === totalPages ? '#f1f2f6' : 'white'}; border-radius: 4px; cursor: pointer;">Sau</button>`;
+    }
+    paginationEl.innerHTML = html;
+  }
+
+  function changePage(page) {
+    currentPage = page;
+    renderAdminBookTable();
   }
 
   function toggleTrashMode() {
     isTrashMode = !isTrashMode;
+    currentPage = 1;
     const header = document.getElementById('table-title');
     const btnText = document.getElementById('trash-btn-text');
     const btnIcon = document.getElementById('trash-btn-icon');
     const btnAdd = document.getElementById('btn-add-book');
 
     if(isTrashMode) {
-      btnIcon.innerText = "🔙";
-      btnText.innerText = "Quay lại Kho";
-      header.innerText = "Thùng rác (Sách đã xóa)";
-      header.style.borderLeftColor = "#e74c3c";
-      btnAdd.style.display = "none"; // Ẩn nút thêm khi ở thùng rác
+      btnIcon.innerText = "🔙"; btnText.innerText = "Quay lại Kho";
+      header.innerText = "Thùng rác (Sách đã xóa)"; header.style.borderLeftColor = "#e74c3c";
+      if(btnAdd) btnAdd.style.display = "none";
     } else {
-      btnIcon.innerText = "🗑️";
-      btnText.innerText = "Thùng rác";
-      header.innerText = "Kho Sách Của Bạn";
-      header.style.borderLeftColor = "#3498db";
-      btnAdd.style.display = "block";
+      btnIcon.innerText = "🗑️"; btnText.innerText = "Thùng rác";
+      header.innerText = "Kho Sách Của Bạn"; header.style.borderLeftColor = "#3498db";
+      if(btnAdd) btnAdd.style.display = "block";
     }
     renderAdminBookTable();
   }
@@ -171,11 +201,7 @@
   function updateStatus(id, status) {
     let books = JSON.parse(localStorage.getItem('adc_books_db')) || [];
     let idx = books.findIndex(b => b.id === id);
-    if (idx !== -1) {
-      books[idx].isDeleted = status;
-      localStorage.setItem('adc_books_db', JSON.stringify(books));
-      renderAdminBookTable();
-    }
+    if (idx !== -1) { books[idx].isDeleted = status; localStorage.setItem('adc_books_db', JSON.stringify(books)); renderAdminBookTable(); }
   }
   function permanentDeleteBook(id) {
     if (confirm("Xóa vĩnh viễn không thể khôi phục?")) {
@@ -186,7 +212,8 @@
   }
 
   function openBookModal(id = null) {
-    document.getElementById('bookModal').style.display = 'flex';
+    const modal = document.getElementById('bookModal');
+    modal.style.display = 'flex';
     if (id) {
       let books = JSON.parse(localStorage.getItem('adc_books_db')) || [];
       let b = books.find(item => item.id === id);
@@ -207,20 +234,24 @@
       document.getElementById('form-book-author').value = '';
       document.getElementById('form-book-price').value = '';
       document.getElementById('form-book-stock').value = '0';
+      document.getElementById('form-book-category').value = 'Văn học';
       document.getElementById('form-book-img').value = '';
     }
   }
+
   function closeBookModal() { document.getElementById('bookModal').style.display = 'none'; }
+
   function saveBook() {
     let title = document.getElementById('form-book-title').value.trim();
     let author = document.getElementById('form-book-author').value.trim();
     let price = document.getElementById('form-book-price').value;
     let stock = document.getElementById('form-book-stock').value;
     let img = document.getElementById('form-book-img').value.trim();
-    if (!title || !author || !price || !img) { alert("Vui lòng nhập đủ!"); return; }
+    if (!title || !author || !price || !img) { alert("Vui lòng nhập đủ thông tin!"); return; }
 
     let books = JSON.parse(localStorage.getItem('adc_books_db')) || [];
     let id = document.getElementById('form-book-id').value;
+
     if (id === '') {
       let newId = xoaDauTiengViet(title).replace(/[^a-z0-9]/g, '-') + '-' + Date.now();
       books.push({ id: newId, title, author, price: Number(price), stock: Number(stock), category: document.getElementById('form-book-category').value, img, isDeleted: false });
@@ -228,16 +259,31 @@
       let idx = books.findIndex(b => b.id === id);
       if (idx !== -1) books[idx] = { ...books[idx], title, author, price: Number(price), stock: Number(stock), category: document.getElementById('form-book-category').value, img };
     }
+
     localStorage.setItem('adc_books_db', JSON.stringify(books));
-    closeBookModal(); renderAdminBookTable();
+    closeBookModal();
+    renderAdminBookTable();
   }
 
   function dangXuatAdmin() { if(confirm("Đăng xuất?")) window.location.href = 'dang-nhap.html'; }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // TỰ ĐỘNG BƠM SỐ LƯỢNG NGẪU NHIÊN CHO SÁCH ĐANG HẾT HÀNG
+    let books = JSON.parse(localStorage.getItem('adc_books_db')) || [];
+    let hasChanges = false;
+    books.forEach(b => {
+      if (!b.stock || b.stock === 0) {
+        b.stock = Math.floor(Math.random() * 41) + 10; // Random từ 10 đến 50 cuốn
+        hasChanges = true;
+      }
+    });
+    if (hasChanges) localStorage.setItem('adc_books_db', JSON.stringify(books));
+
     renderAdminBookTable();
-    document.getElementById('search-admin-book').addEventListener('input', renderAdminBookTable);
-    document.getElementById('filter-admin-category').addEventListener('change', renderAdminBookTable);
+
+    // Reset về trang 1 khi gõ tìm kiếm
+    document.getElementById('search-admin-book').addEventListener('input', () => { currentPage = 1; renderAdminBookTable(); });
+    document.getElementById('filter-admin-category').addEventListener('change', () => { currentPage = 1; renderAdminBookTable(); });
   });
 </script>
 </body>
